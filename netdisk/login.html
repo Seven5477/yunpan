@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link rel="stylesheet" href="./static/css/login.css">
+        <script src="https://cdn.bootcss.com/jquery/3.4.1/jquery.js"></script>
+        <title>Document</title>
+    </head>
+    <body>
+        <div class="form">
+            <h2>
+                <span>登录</span>
+            </h2>
+            <div class="form-area">
+                <div class="title">
+                    <a href="#">短信快捷登录>></a>
+                </div>
+                <div class="form-item name">
+                    <input type="text" name="username" placeholder="请输入账号">
+                </div>
+                <div class="form-item pwd">
+                    <input type="password" name="password" placeholder="请输入密码">
+                </div>
+                <div class="form-item login">
+                    <button onclick="login()">登录</button>
+                </div>
+                <div class="forget">
+                    <a href="#">忘记密码？</a>
+                </div>           
+                <div class="regist">
+                    <span>其他方式登录：</span>
+                    <a href="#">立即注册</a>
+                </div>
+            </div>
+        </div>
+    </body>
+    <script>
+        function login() {
+            let username = document.getElementsByName("username")[0].value,
+                password = document.getElementsByName("password")[0].value;
+            let login_data = "{\"username\""+ ":\"" + username + "\"," + "\"password\"" + ":\"" + password + "\"}";
+            console.log(username + " " + password);
+            $.ajax(
+                {
+                    url:"http://localhost:9090/login_auth",
+                    data: login_data,
+                    type: "POST",
+                    async: true,
+                    success: function(data)
+                    {
+                        if(data){
+                            //alert("登录成功");
+                            window.location.href = "http://localhost:9090/index";
+                            return true;
+                        }
+                        else{
+                            alert("用户名密码错误");
+                            return false;
+                        }
+                    },
+                    error: function()
+                    {
+                        alert("服务器错误")
+                    }
+                });
+        }
+    </script>
+</html>

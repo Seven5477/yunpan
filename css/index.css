@@ -3,7 +3,7 @@ body{
 }
 .inner{
     width: 80%;
-    margin: 30px auto;
+    margin: 100px auto;
 }
 .fl{
     float: left;
@@ -19,7 +19,7 @@ body{
 }
 /* 顶部 */
 .top{
-    width: 100%;
+    width: 1176px;
     height: 80px;
     border: 1px solid purple;
 }
@@ -88,14 +88,14 @@ body{
 }
 /* 正文 */
 .main{
-    width: 100%;
+    width: 1176px;
     height: 600px;
     margin-top: 10px;
-    border: 1px solid blue;
+    border: 1px solid purple;
 }
 /* 正文左侧 */
 .main .left{
-    width: 18%;
+    width: 171px;
     height: 600px;
     background: #f8f7f7;
 }
@@ -126,7 +126,7 @@ body{
 /* 正文右侧 */
 .main .right{
     margin-left: 15px;
-    width: 896px;;
+    width: 987px;;
 }
 .main .right .features {
     height: 55px;
@@ -169,12 +169,18 @@ body{
     text-align: left;
     font-size: 14px;
 }
-.main .content td.tdwidth1{
-    width: 450px;
+.filename{
+    width: 620px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
 }
-.main .content td.tdwidth2{
-    width: 200px;
+.tdwidth1{
+    width: 630px;
 }
-.main .content td.tdwidth3{
+.tdwidth2{
+    width: 120px;
+}
+.tdwidth3{
     width: 200px;
 }
