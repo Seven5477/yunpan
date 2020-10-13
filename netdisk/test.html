@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<style>
+    #content{
+        width: 400px;
+        height: 400px;
+        border: 1px solid blue;
+        margin: 20px auto;
+    }
+    table{
+        width: 400px;
+        border-collapse:collapse;
+    }
+    .trstyle{
+        width: 100%;
+    }
+    table tr td{
+        height: 30px;
+        line-height: 30px;
+        border-bottom: 1px solid purple;
+        padding-left: 10px;
+    }
+    .tdwidth1{
+        width: 170px;
+    }
+    .tdwidth2{
+        width: 100px;
+    }
+    .tdwidth2{
+        width: 100px;
+    }
+</style>
+<body>
+    <div id="content">
+        <table>
+            <tr class="trstyle">
+                <th class="tdwidth1">文件名</th>
+                <th class="tdwidth2">大小</th>
+                <th class="tdwidth3">修改日期</th>
+            </tr>
+        </table>
+        <!-- <table>
+            <tr class="trstyle">
+                <td class="tdwidth1"></td>
+                <td class="tdwidth2"></td>
+                <td class="tdwidth3"></td>
+            </tr>
+        </table> -->
+    </div>
+</body>
+
+<script>
+//读取JSON文件，把字符串转换为js对象
+var container = document.getElementById("content");
+var json_table = "{\"name\": [\"alin\", \"tom\", \"jack\", \"xiaowang\"],\"age\": [\"20\", \"16\", \"18\", \"19\"],\"bron\": [\"sahnghai\", \"guiyang\", \"beijing\", \"chengdu\"]}";
+
+            var message = JSON.parse(json_table);
+            
+            //创建表元素
+            var json_table = document.createElement("table");
+            var json_tr = document.createElement("tr");
+ 
+ 
+            //读取JSON文件中键的数量已经各键值的数量来创建表
+ 
+            // for(var key in message) {
+ 
+            //     var json_th = document.createElement("th");
+                
+            //     //获取键名
+            //     var th_txt = document.createTextNode(key);
+ 
+            //     json_th.appendChild(th_txt);
+            //     json_tr.appendChild(json_th);
+            //     json_table.appendChild(json_tr);
+                
+            //     //修改表格样式
+            //     json_th.style.border = "1px solid black";
+ 
+               
+            // }
+    
+            for(var num in message.name) {
+ 
+                var json_tr = document.createElement("tr");
+                
+ 
+                for(var key in message) {
+                    var json_td = document.createElement("td");
+                    var td_txt = document.createTextNode(message[key][num]);
+                   
+                    json_td.appendChild(td_txt);
+                    json_tr.appendChild(json_td);
+                    json_table.appendChild(json_tr);
+ 
+                   
+                    json_td.style.border = "1px solid black";
+                
+                    //计算点击次数
+                    var count = 0;
+ 
+                    //按单元格显示对应的名片
+                    json_td.onclick = function() {
+ 
+                        var txt = "";
+                        count++;
+ 
+                        for(var key in message) {
+                           
+                            txt += message[key][this.parentNode.rowIndex - 1] + "   ";
+                           
+                        }
+ 
+                        //再次点击时删除之前的名片
+                        if(count > 1) {
+                            container.removeChild(document.getElementsByTagName("div")[1]);
+                        }
+                        
+                        //创建名片
+                        createCard(txt);
+                         
+                    }
+                }
+         
+                
+            }
+   
+            //添加表格
+            container.appendChild(json_table);
+          
+            //改变表格样式
+            json_table.style.border = "1px solid black";
+            // json_table.style.width = "800px";
+</script>
+
+</html>

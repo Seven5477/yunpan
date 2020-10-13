@@ -1,0 +1,186 @@
+body{
+    background: #fff;
+}
+.inner{
+    width: 80%;
+    margin: 100px auto;
+}
+.fl{
+    float: left;
+}
+.fr{
+    float: right;
+}
+/* 清除浮动 */
+.clearfix:after{
+    content: "";
+    display: block;
+    clear: both;
+}
+/* 顶部 */
+.top{
+    width: 1176px;
+    height: 80px;
+    border: 1px solid purple;
+}
+/* logo */
+.top .logo{
+    height: 60px;
+    line-height: 60px;
+    width: 200px;
+    margin: 10px 60px;
+}
+.top .logo img{
+    height: 60px;
+}
+.top .logo h1{
+    font-size: 28px;
+    color: #856eac;
+}
+.top .line{
+    height: 30px;
+    width: 1.5px;
+    margin: 25px 0px;
+    background: #b8b6bd;
+}
+/* 选项 */
+.top .title{
+    width: 300px;
+    height: 60px;
+    margin: 10px 30px;
+}
+.top .title li{
+    float: left;
+    width: 60px;
+    height: 40px;
+    text-align: center;
+    margin: 10px 10px;
+}
+.top .title li a{
+    font-size: 19px;
+    color: #1f77a6;
+    line-height: 40px;
+}
+/* 用户 */
+.top .user-logout{
+    width: 250px;
+    height: 40px;
+    margin: 20px 55px;
+}
+.top .user{
+    margin: 0 20px;
+    height: 40px;
+    line-height: 40px;
+}
+.top .user a{
+    font-size: 15px;
+    color: #424e67;
+}
+/* 退出 */
+.top .logout{
+    margin: 0 20px;
+    height: 40px;
+    line-height: 40px;
+}
+.top .logout a{
+    font-size: 16px;
+    color: #333;
+}
+/* 正文 */
+.main{
+    width: 1176px;
+    height: 600px;
+    margin-top: 10px;
+    border: 1px solid purple;
+}
+/* 正文左侧 */
+.main .left{
+    width: 171px;
+    height: 600px;
+    background: #f8f7f7;
+}
+.main .left .title{
+    height: 40px;
+    line-height: 40px;
+    padding-left: 55px;
+}
+.main .left .title .iconfont{
+    font-size: 18px;
+    color: #666;
+    margin-left: -24px;
+}
+.main .left .title:hover{
+    background: #f2eded;
+    color: #3b97b7;
+}
+.main .left .title a{
+    font-size: 18px;
+    color: #666;
+}
+.main .left .title i:active{
+    color: #3b97b7;
+}
+.main .left .title a:active{
+    color: #3b97b7;
+}
+/* 正文右侧 */
+.main .right{
+    margin-left: 15px;
+    width: 987px;;
+}
+.main .right .features {
+    height: 55px;
+    border-bottom: 1px solid #e0d4d4;
+}
+.main .right .features li{
+    float: left;
+    width: 120px;
+    height: 30px;
+    line-height: 30px;
+    text-align: center;
+    font-size: 16px;
+    color: #3b97b7;
+    border: 1px solid #3b97b7;
+    border-radius: 3px;
+    background: #f9f8f8;
+    margin: 10px 20px;
+}
+.main .right .features li i{
+    font-size: 18px;
+    font-weight: 600;
+}
+.main .right .features li button{
+    background: none;
+}
+/* 表格 */
+.main .content{
+    margin-top: 15px;
+}
+.main .content table{
+   border-collapse: collapse;
+}
+.main .content .trstyle{
+    height: 30px;
+    line-height: 30px;
+    border-bottom: 1px solid #eeeeee;
+}
+.main .content td{
+    padding: 0 10px;
+    text-align: left;
+    font-size: 14px;
+}
+.filename{
+    width: 620px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+.tdwidth1{
+    width: 630px;
+}
+.tdwidth2{
+    width: 120px;
+}
+.tdwidth3{
+    width: 200px;
+}
