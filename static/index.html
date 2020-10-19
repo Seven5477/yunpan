@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="./static/css/reset.css">
+    <link rel="stylesheet" href="./static/css/index.css">
+    <link rel="stylesheet" href="./static/css/iconfont.css">
+    <script src="./static/js/jquery.min.js"></script>
+    <script src="./static/js/index.js"></script>
+    <script src="./static/js/click.js"></script>
+    <title>Sault</title>
+</head>
+<body onload="loadPage()">
+    <div class="inner">
+        <div class="top clearfix">
+            <div class="logo fl">
+                <img class="fl" src="./static/imgs/logo.png" alt="logo">
+                <h1 class="fl">Sault</h1>
+            </div>
+            <div class="line fl"></div>
+            <ul class="title fl">
+                <li><a href="#">网盘</a></li>
+                <li><a href="#">分享</a></li>
+            </ul>
+            <div class="line fl"></div>
+            <div class="user-logout fr">
+                <div class="user fl"></div>
+                <div class="logout fl"><a href="#" onclick="logout()">退出</a></div>
+            </div>
+        </div>
+        <div class="main clearfix">
+            <div class="left fl">
+                <div class="title" style="margin-top: 20px;">
+                    <i class="iconfont icon-wenjian"></i>
+                    <a href="#">全部文件</a>
+                </div>
+                <div class="title">
+                    <a href="#">图片</a>
+                </div>
+                <div class="title">
+                    <a href="#">文档</a>
+                </div>
+                <div class="title">
+                    <a href="#">音频</a>
+                </div>
+                <div class="title">
+                    <i class="iconfont icon-huishouzhan_huaban"></i>
+                    <a href="#">回收站</a>
+                </div>
+            </div>
+            <div class="right fl">
+                <div class="features clearfix">
+                    <ul>
+                        <li class="upload">
+                            <div class="feature_one">
+                                <i class="iconfont icon-shangchuan"></i>
+                                <button>上传</button>
+                            </div>
+                            <ul class="upload_file">
+                                <form method="post" id="filename" name="filename" enctype="multipart/form-data">
+                                    <label for="file">
+                                        <input type="file" id="file" name="uploadfile" 
+                                            style="display: none;" onchange="uploadFile()">
+                                            <li class="file">上传文件</li>
+                                    </label>
+                                </form>
+                                <form method="post" id="filesname" name="filesname" enctype="multipart/form-data">
+                                    <label for="files">
+                                        <input type="file" id="files" name="uploadfile" webkitdirectory=""
+                                            style="display: none;" onchange="uploadFiles()">
+                                            <li class="file">上传文件夹</li>
+                                    </label>
+                                </form>
+                            </ul>
+                        </li>
+                        <li class="new">
+                            <i class="iconfont icon-xinjianwenjianjia"></i>
+                            <button onclick="newFile()">新建文件夹</button>
+                        </li>
+                        <li class="download">
+                            <i class="iconfont icon-download"></i>
+                            <button onclick="downloadFile()">离线下载</button>
+                        </li>
+                    </ul>
+                </div>
+                <div class="return">
+                    <span class="last_file" onclick="returnFile()">返回上一级</span>
+                    <span class="file_system">全部文件>test>1.jpg</span>
+                </div>
+                <div class="content">
+                    <table>
+                        <tr class="trstyle">
+                            <td class="tdwidthbox">
+                                <label onclick="checkall()" class="checklabel">
+                                    <input type="checkbox" class="checkbox">
+                                    <i class="check"></i>
+                                </label>
+                            </td>
+                            <td class="tdwidth1">文件名</td>
+                            <td class="tdwidth2">大小</td>
+                            <td class="tdwidth3">修改日期</td>
+                        </tr>
+                    </table>
+                    <ul class="menu">
+                        <li onclick="downloadFile()">下载</li>
+                        <li onclick="rename()">重命名</li>
+                        <li onclick="deleteFile()" style="border-bottom: none;">删除</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <div class="bottom"></div>
+    </div>
+</body>
+
+</html>

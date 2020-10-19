@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<style>
+    .trstyle{
+    height: 40px;
+    line-height: 40px;
+    border: 1px solid blue;
+}
+</style>
+<body>
+    <!-- <input title="点击选择文件夹"  webkitdirectory="" type="file" > -->
+    <table style="border-collapse:collapse;">
+        <tr class="trstyle">
+            <td class="tdwidthbox">
+                <label  class="checklabel">
+                    <input type="checkbox" class="checkbox">
+                    <i class="check"></i>
+                </label>
+            </td>
+            <td class="tdwidth1">文件名</td>
+            <td class="tdwidth2">大小</td>
+            <td class="tdwidth3">修改日期</td>
+        </tr>
+        <tr class="trstyle">
+            <td class="tdwidthbox">
+                <label  class="checklabel">
+                    <input type="checkbox" class="checkbox">
+                    <i class="check"></i>
+                </label>
+            </td>
+            <td class="tdwidth1">文件名</td>
+            <td class="tdwidth2">大小</td>
+            <td class="tdwidth3">修改日期</td>
+        </tr>
+        <tr class="trstyle">
+            <td class="tdwidthbox">
+                <label  class="checklabel">
+                    <input type="checkbox" class="checkbox">
+                    <i class="check"></i>
+                </label>
+            </td>
+            <td class="tdwidth1">文件名</td>
+            <td class="tdwidth2">大小</td>
+            <td class="tdwidth3">修改日期</td>
+        </tr>
+    </table>
+</body>
+<script>
+    let labelList = document.getElementsByClassName("checklabel"),
+        trList = document.getElementsByTagName("tr"),
+		labelLen = labelList.length;
+	(function() {
+		for(let i = 0; i < labelLen; i++) {
+			labelList[i].onclick = function () {
+				if(labelList[i].checked) {
+					labelList[i].checked = false;
+					trList[i].style.background = "#e8f6fd";
+				}
+				else{				
+					labelList[i].checked = true;
+					trList[i].style.background = "none";
+				}
+				console.log(labelList[i].checked);
+			}
+		}
+	})();
+
+</script>
+</html>

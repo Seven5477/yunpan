@@ -1,0 +1,376 @@
+body{
+    background: #fff;
+}
+.inner{
+    width: 1180px;
+    margin: 100px auto;
+}
+.fl{
+    float: left;
+}
+.fr{
+    float: right;
+}
+/* 清除浮动 */
+.clearfix:after{
+    content: "";
+    display: block;
+    clear: both;
+}
+/* 顶部 */
+.top{
+    width: 1176px;
+    height: 80px;
+    border: 1px solid purple;
+}
+/* logo */
+.top .logo{
+    height: 60px;
+    line-height: 60px;
+    width: 200px;
+    margin: 10px 60px;
+}
+.top .logo img{
+    height: 60px;
+}
+.top .logo h1{
+    font-size: 28px;
+    color: #856eac;
+}
+.top .line{
+    height: 30px;
+    width: 1.5px;
+    margin: 25px 0px;
+    background: #b8b6bd;
+}
+/* 选项 */
+.top .title{
+    width: 300px;
+    height: 60px;
+    margin: 10px 30px;
+}
+.top .title li{
+    float: left;
+    width: 60px;
+    height: 40px;
+    text-align: center;
+    margin: 10px 10px;
+}
+.top .title li a{
+    font-size: 19px;
+    color: #1f77a6;
+    line-height: 40px;
+}
+/* 用户 */
+.top .user-logout{
+    width: 250px;
+    height: 40px;
+    margin: 20px 55px;
+}
+.top .user{
+    margin: 0 20px;
+    height: 40px;
+    line-height: 40px;
+}
+.top .user a{
+    font-size: 15px;
+    color: #424e67;
+}
+/* 退出 */
+.top .logout{
+    margin: 0 20px;
+    height: 40px;
+    line-height: 40px;
+}
+.top .logout a{
+    font-size: 16px;
+    color: #333;
+}
+/* 正文 */
+.main{
+    width: 1176px;
+    height: 600px;
+    margin-top: 10px;
+    border: 1px solid purple;
+}
+/* 正文左侧 */
+.main .left{
+    width: 171px;
+    height: 600px;
+    background: #f8f7f7;
+}
+.main .left .title{
+    height: 40px;
+    line-height: 40px;
+    padding-left: 55px;
+}
+.main .left .title .iconfont{
+    font-size: 18px;
+    color: #666;
+    margin-left: -24px;
+}
+.main .left .title:hover{
+    background: #f2eded;
+    color: #3b97b7;
+}
+.main .left .title a{
+    font-size: 18px;
+    color: #666;
+}
+.main .left .title i:active{
+    color: #3b97b7;
+}
+.main .left .title a:active{
+    color: #3b97b7;
+}
+/* 正文右侧 */
+.main .right{
+    margin-left: 15px;
+    width: 987px;
+    position: relative;
+}
+.main .right .features {
+    height: 66px;
+}
+.main .right .features>ul>li{
+    float: left;
+    width: 120px;
+    height: 30px;
+    line-height: 30px;
+    text-align: center;
+    font-size: 16px;
+    color: #3b97b7;
+    border: 1px solid #3b97b7;
+    border-radius: 3px;
+    background: #f9f8f8;
+    margin: 19px 20px;
+}
+.main .right .features li.upload{
+    position: relative;
+    background: #e8f6fd;
+}
+.main .right .features .feature_one {
+    width: 120px;
+    height: 30px;
+    line-height: 30px;
+    text-align: center;
+}
+.main .right .features li i{
+    font-size: 18px;
+    font-weight: 600;
+}
+.main .right .features li button{
+    background: none;
+}
+/* 返回上一级和当前文件位置 */
+.main .right .return{
+    width: 100%;
+    height: 20px;
+    padding-left: 5px;
+    margin-top: 5px;
+}
+.main .right .return .last_file{
+    cursor: pointer;
+    color: #3b97b7;
+    font-size: 14px;
+}
+.main .right .return .file_system{
+    margin-left: 5px;
+    padding-left: 5px;
+    border-left: 1px solid ;
+    color: #666;
+    font-size: 14px;
+}
+/* 表格 */
+.main .right .content{
+    margin-top: 15px;
+    margin-bottom: 10px;
+    height: 460px;
+    overflow: auto;
+}
+.content::-webkit-scrollbar {
+    width: 7px;
+    height: 5px;
+}
+.content::-webkit-scrollbar-thumb {/*滚动条里面小方块*/
+    border-radius: 5px;
+    -webkit-box-shadow: inset 0 0 5px rgba(0,0,0,0.2);
+    background: #e8f6fd;
+}
+.content::-webkit-scrollbar-track {/*滚动条里面轨道*/
+    -webkit-box-shadow: inset 0 0 5px rgba(0,0,0,0.2);
+    border-radius: 0;
+    background: #f8f7f7;
+}
+.main .right .content table{
+   border-collapse: collapse;
+}
+.main .right .content .trstyle{
+    height: 40px;
+    line-height: 40px;
+    border-bottom: 1px solid #eeeeee;
+}
+.main .right .content .trstyle:hover{
+    background: #e8f6fd;
+}
+.main .right .content td{
+    padding: 0 10px 0 5px;
+    text-align: left;
+    font-size: 14px;
+}
+.file_name{
+    padding-left: 30px;
+    width: 620px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+.file_name span{
+    font-size: 14px;
+    display: inline-block;
+    min-width: 40px;
+    color: #424e67;
+}
+.file_name span:hover {
+    cursor: pointer;
+    color: #3b97b7;
+}
+.checklabel{
+    position: absolute;
+    top: 11px;
+    left: 10px;
+}
+.checkbox{
+    display: none;
+}
+.check{
+    width: 18px;
+    height: 18px;
+    display: block;
+    background: url(../imgs/nochecked.png) no-repeat;
+    cursor: pointer;
+}
+input:checked+.check {
+    width: 18px;
+    height: 18px;
+    display: block;
+    background: url(../imgs/checked.png) no-repeat;
+    cursor: pointer;
+}
+.tdwidthbox{
+    width: 20px;
+    position: relative;
+}
+.tdwidth1{
+    width: 600px;
+    position: relative;
+}
+.tdwidth2{
+    width: 120px;
+}
+.tdwidth3{
+    width: 200px;
+}
+.new_input{
+    margin-left: 30px;
+    width: 256px;
+    height: 30px;
+    text-indent: 4px;
+    border: 1px solid #66afe9;
+}
+.new_input:focus{
+    border-color: #66afe9;
+    box-shadow: inset 0 1px 1px rgba(0,0,0,.075), 0 0 8px rgba(102,175,233,.6);
+}
+.icon{
+    width: 62px;
+    height: 29px;
+    display: inline-block;
+    vertical-align: middle;
+    margin: -2px 2px 2px 5px;
+    position: relative;
+}
+.icon_1{
+    position: absolute;
+    width: 30px;
+    height: 30px;
+    left: 0;
+    top: 1.5px;
+    background-image: url(../imgs/new_save.png);
+    background-size: 90% 90%;
+    background-repeat: no-repeat;
+    cursor: pointer;
+}
+.icon_2{
+    position: absolute;
+    width: 30px;
+    height: 30px;
+    left: 33px;
+    top: 1.3px;
+    background-image: url(../imgs/new_cancel.png);
+    background-size: 87% 87%;
+    background-repeat: no-repeat;
+    cursor: pointer;
+}
+.hide{
+    display: none;
+}
+.menu{
+    display: none;
+    position: absolute;
+    left: 210px;
+    top: 150px;
+    width: 80px;
+    height: 100px;
+    background-color: #fff;
+    border-radius: 3px;
+    border: 1px solid #cabcbc;
+}
+.menu li{
+    cursor: pointer;
+    height: 20px;
+    line-height: 20px;
+    padding-left: 20px;
+    margin-top: 10px;
+    border-bottom: 1px solid #eeeeee;
+}
+.upload_file{
+    z-index: 1;
+    display: none;
+    position: absolute;
+    left: -1px;
+    top: 30px;
+    border: 1px solid #3b97b7;
+    border-radius: 0 0 3px 3px;
+    background: #fff;
+}
+.upload_file li.file{
+    width: 120px;
+    height: 30px;
+    line-height: 30px;
+    text-align: center;
+    font-size: 16px;
+    color: #3b97b7;
+}
+.upload_file li.file:hover{
+    cursor: pointer;
+}
+.dir_label{
+    position: absolute;
+    top: 7px;
+    left: 6px;
+}
+.dir_i{
+    width: 30px;
+    height: 30px;
+    display: block;
+    background: url(../imgs/dir.png) no-repeat;
+    background-size: 90% 80%;
+}
+.file_i{
+    width: 30px;
+    height: 30px;
+    display: block;
+    background: url(../imgs/file.png) no-repeat;
+    background-size: 90% 80%;
+}

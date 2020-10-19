@@ -1,0 +1,65 @@
+{
+  "id": "2119505",
+  "name": "云盘",
+  "font_family": "iconfont",
+  "css_prefix_text": "icon-",
+  "description": "",
+  "glyphs": [
+    {
+      "icon_id": "3069808",
+      "name": "勾",
+      "font_class": "tick",
+      "unicode": "e605",
+      "unicode_decimal": 58885
+    },
+    {
+      "icon_id": "6536737",
+      "name": "叉号",
+      "font_class": "chahao",
+      "unicode": "e668",
+      "unicode_decimal": 58984
+    },
+    {
+      "icon_id": "4880416",
+      "name": "上传",
+      "font_class": "shangchuan",
+      "unicode": "e603",
+      "unicode_decimal": 58883
+    },
+    {
+      "icon_id": "1105001",
+      "name": "下载",
+      "font_class": "download",
+      "unicode": "e60a",
+      "unicode_decimal": 58890
+    },
+    {
+      "icon_id": "3092324",
+      "name": "文件",
+      "font_class": "wenjian",
+      "unicode": "e793",
+      "unicode_decimal": 59283
+    },
+    {
+      "icon_id": "11535046",
+      "name": "云盘上传",
+      "font_class": "yunpanshangchuan",
+      "unicode": "e655",
+      "unicode_decimal": 58965
+    },
+    {
+      "icon_id": "12752070",
+      "name": "回收站",
+      "font_class": "huishouzhan_huaban",
+      "unicode": "e615",
+      "unicode_decimal": 58901
+    },
+    {
+      "icon_id": "15644388",
+      "name": "新建文件夹",
+      "font_class": "xinjianwenjianjia",
+      "unicode": "e6cd",
+      "unicode_decimal": 59085
+    }
+  ]
+}
