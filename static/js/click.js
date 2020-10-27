@@ -1,6 +1,6 @@
 // 退出
 function logout() {
-    window.location.href = "http://localhost:9090/logout";
+    window.location.href = logout_href;
 }
 
 // 校验文件名
@@ -36,7 +36,7 @@ function fileShow(ret) {
     // 显示当前目录
     $.ajax(
         {
-            url: "http://localhost:9090/home",
+            url: home_rpc,
             data: index_data,
             type: "POST",
             async: false,
@@ -194,6 +194,7 @@ function fileShow(ret) {
         for(let i = 1; i < labelLen; i++) {
             labelList[i].onclick = function (e) {
                 stopPropagation(e);
+                menu.style.display = 'none';
                 if(checkList[i].checked) {
                     checkList[i].checked = false;
                     trList[i].style.background = "none";
@@ -207,20 +208,31 @@ function fileShow(ret) {
     })();
 
     //左键点击查看文件
-    let filenameList = [];  //存储文件名
-    for (let i = 0; i < fileLen; i++) {
-        filenameList[i] = fileList[i].getElementsByTagName("span")[0];
-    }
-    let nameLen = filenameList.length;
-    (function () {
-        for (let i = 0; i < nameLen; i++) {
-            filenameList[i].onclick = function (e) {
-                stopPropagation(e);
-                current_file = key_word[i];
-                fileShow(current_file);
-            }
-        }
-    })();
+    let	filenameList = [];  //存储文件名
+	let tdList = document.getElementsByClassName("tdwidth1"),
+		td1Len = tdList.length;
+		i_list = [];
+	for (let i = 0; i < fileLen; i++) {
+		filenameList[i] = fileList[i].getElementsByTagName("span")[0];
+	}
+	for (let i = 1; i < td1Len; i++) {
+		i_list.push(tdList[i].getElementsByTagName("i")[0])
+	}
+	let nameLen = filenameList.length;
+	(function () {
+		for (let i = 0; i < nameLen; i++) {
+			filenameList[i].onclick = function (e) {
+				stopPropagation(e);
+				current_file = key_word[i];
+				if(i_list[i].className == "file_i") {
+					return;
+				}
+				else{
+					fileShow(current_file);
+				}
+			}
+		}
+	})();
 
     // 右键文件弹出菜单
 	(function() {
@@ -432,7 +444,7 @@ function newFile() {
                 let new_data = "{\"Opt\"" + ":" + "1" + "," + "\"DirName\"" + ":" + "[\"" + input_value + "\"]" + "}";
                 $.ajax(
                     {
-                        url: "http://localhost:9090/home",
+                        url: home_rpc,
                         data: new_data,
                         type: "POST",
                         async: false,
@@ -479,7 +491,7 @@ function uploadFile() {
     if (ret) {
         $.ajax(
             {
-                url: "http://localhost:9090/upload",
+                url: upload_rpc,
                 data: form_data,
                 type: "POST",
                 cache: false,
@@ -514,7 +526,7 @@ function uploadFiles() {
     if (ret) {
         $.ajax(
             {
-                url: "http://localhost:9090/upload",
+                url: upload_rpc,
                 data: form_data,
                 type: "POST",
                 cache: false,
@@ -555,7 +567,7 @@ function deleteFile() {
     console.log(del_data);
     $.ajax(
         {
-            url: "http://localhost:9090/home",
+            url: home_rpc,
             data: del_data,
             type: "POST",
             async: false,
@@ -564,6 +576,7 @@ function deleteFile() {
                     console.log("Delete data: success!");
                     let menu = document.getElementsByClassName("menu")[0];  //右键的菜单
                     menu.style.display = "none";
+                    select_list = [];
                     fileShow(current_file);
                     return true;
                 }
@@ -585,7 +598,7 @@ function downloadFile() {
         input = document.createElement("input");
     form.style.display = "none";
     form.method = "post";
-    form.action = "http://localhost:9090/download";
+    form.action = download_rpc;
     form.enctype = "multipart/form-data";
     input.type = "hidden";
     input.name = "downloadfile";

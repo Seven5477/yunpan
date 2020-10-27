@@ -21,7 +21,7 @@ function loadPage() {
 	// 显示当前目录
 	$.ajax(
 		{
-			url: "http://localhost:9090/home",
+			url: home_rpc,
 			data: index_data,
 			type: "POST",
 			async: false,
@@ -141,7 +141,6 @@ function loadPage() {
 				this.index = i + 1;
 				// 清除所有选中框的样式
 				clearBox();
-				console.log(this.index)
 				// 清除上一次右键点击的样式
 				trList[lastIndex_rightBtn].style.background = "none";
 				checkList[lastIndex_rightBtn].checked = false;
@@ -169,6 +168,7 @@ function loadPage() {
 		for(let i = 1; i < labelLen; i++) {
 			labelList[i].onclick = function (e) {
 				stopPropagation(e);
+				menu.style.display = 'none';
 				if(checkList[i].checked) {
 					checkList[i].checked = false;
 					trList[i].style.background = "none";
@@ -183,8 +183,14 @@ function loadPage() {
 
 	//左键点击查看文件
 	let	filenameList = [];  //存储文件名
+	let tdList = document.getElementsByClassName("tdwidth1"),
+		td1Len = tdList.length;
+		i_list = [];
 	for (let i = 0; i < fileLen; i++) {
 		filenameList[i] = fileList[i].getElementsByTagName("span")[0];
+	}
+	for (let i = 1; i < td1Len; i++) {
+		i_list.push(tdList[i].getElementsByTagName("i")[0])
 	}
 	let nameLen = filenameList.length;
 	(function () {
@@ -192,7 +198,12 @@ function loadPage() {
 			filenameList[i].onclick = function (e) {
 				stopPropagation(e);
 				current_file = key_word[i];
-				fileShow(current_file);
+				if(i_list[i].className == "file_i") {
+					return;
+				}
+				else{
+					fileShow(current_file);
+				}
 			}
 		}
 	})();
