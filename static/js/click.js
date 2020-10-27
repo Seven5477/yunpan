@@ -222,7 +222,7 @@ function fileShow(ret) {
 	(function () {
 		for (let i = 0; i < nameLen; i++) {
 			filenameList[i].onclick = function (e) {
-				stopPropagation(e);
+                stopPropagation(e);
 				current_file = key_word[i];
 				if(i_list[i].className == "file_i") {
 					return;
@@ -232,7 +232,41 @@ function fileShow(ret) {
 				}
 			}
 		}
-	})();
+    })();
+
+    // 鼠标双击
+    (function () {
+        for (let i = 0; i < fileLen; i++) {
+            fileList[i].ondblclick = function (e) {
+                stopPropagation(e);
+                this.index = i + 1;
+                clearBox();
+                // 清除上一次右键点击的样式
+                trList[lastIndex_rightBtn].style.background = "none";
+                checkList[lastIndex_rightBtn].checked = false;
+                if (!(trList[this.index])) {
+                    return;
+                }
+                else {
+                    trList[lastIndex_leftBtn].style.background = "none";
+                    checkList[lastIndex_leftBtn].checked = false;
+                    // 添加背景颜色
+                    trList[this.index].style.background = "#e8f6fd";
+                    // 选中方框
+                    checkList[this.index].checked = true;
+                    trList[this.index].isClick = true;
+                    lastIndex_leftBtn = this.index; //保存当前的index
+                }
+                current_file = key_word[i];
+				if(i_list[i].className == "file_i") {
+					return;
+				}
+				else{
+					fileShow(current_file);
+				}
+            }
+        }
+    })();
 
     // 右键文件弹出菜单
 	(function() {
