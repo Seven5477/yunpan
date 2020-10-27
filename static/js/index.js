@@ -6,7 +6,7 @@ let flag = false;  //输入框函数是否成功调用
 // 登录成功后进入用户主界面
 function loadPage() {
 	// 显示用户名
-	let user = document.getElementsByClassName("user")[0];
+	let user = document.getElementsByClassName("username")[0];
 		username = localStorage.getItem("user");  //获取用户名
 		user.innerHTML = username;  //用户名
 

@@ -423,7 +423,8 @@ function newFile() {
     tr.appendChild(td2);
     tr.appendChild(td3);
     tbody.appendChild(tr);
-    table.appendChild(tbody);
+    // table.appendChild(tbody);
+    table.insertBefore(tbody, table.children[1]);
 
     // 保存按钮
     i1.onclick = function (e) {

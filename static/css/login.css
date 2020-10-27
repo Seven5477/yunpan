@@ -46,7 +46,9 @@ input{
     height: 40px;
     border: 0;
     outline: none;
-    text-indent: 10px;
+    text-indent: 16px;
+    font-size: 16px;
+    color: #606266;
     border-radius: 5px;
     border: 1px solid #9e9e9e;
 }
