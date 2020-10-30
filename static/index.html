@@ -126,6 +126,54 @@
                         <li onclick="deleteFile()" style="border-bottom: none;">删除</li>
                     </ul>
                 </div>
+                <!-- 上传进度条 -->
+                <div class="progress" style="height: 300px;">
+                    <!-- 头部信息 -->
+                    <div class="head">
+                        <h3>
+                            <span class="head-title">
+                                <em class="select-text">正在上传</em>
+                            </span>
+                        </h3>
+                        <div class="control clearfix">
+                            <em class="closesize" onclick="closeList()"></em>
+                            <em class="minsize" onclick="changeSize()"></em>
+                        </div>
+                    </div>
+                    <!-- 主体 -->
+                    <div class="body">
+                        <div class="upload-info">
+                            <div class="file-name">文件名</div>
+                            <div class="file-size">大小</div>
+                            <div class="file-path">上传目录</div>
+                            <div class="file-status">状态</div>
+                            <div class="file-operate">操作</div>
+                        </div>
+                        <!-- 错误信息 -->
+                        <div class="upload-error">
+                            <div class="info">严谨上传违法文件,一经发现将严格按照相关法律法规处理。</div>
+                            <em class="close">x</em>
+                        </div>
+                        <!-- 上传的文件目录 -->
+                        <div class="upload-list">
+                            <ul id="uploadList">
+                                <!-- <li class="status">
+                                    <div class="process"></div>
+                                    <div class="file-info">
+                                        <div class="file-name">nand-ipq807x_64-apps(3).img</div>
+                                        <div class="file-size">34.8M</div>
+                                        <div class="file-path">music</div>
+                                        <div class="file-status">准备上传</div>
+                                        <div class="file-operate">
+                                            <em class="continue"></em>
+                                            <em class="remove"></em>
+                                        </div>
+                                    </div>
+                                </li> -->
+                            </ul>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
         <!-- 底部 -->

@@ -1,5 +1,6 @@
 let current_file = ".";  //当前进入的文件
 let select_file = "";  //选中的文件
+let select_dir = "";  //当前目录
 let select_list = [];  //选中的文件数组
 let flag = false;  //输入框函数是否成功调用
 
@@ -202,6 +203,7 @@ function loadPage() {
 					return;
 				}
 				else{
+					select_dir = (fileList[i].getElementsByTagName("span")[0]).innerText;  //当前点击的文件名
 					fileShow(current_file);
 				}
 			}
@@ -212,7 +214,7 @@ function loadPage() {
     (function () {
         for (let i = 0; i < fileLen; i++) {
             fileList[i].ondblclick = function (e) {
-                stopPropagation(e);
+				stopPropagation(e);
                 this.index = i + 1;
                 clearBox();
                 // 清除上一次右键点击的样式
@@ -236,6 +238,7 @@ function loadPage() {
 					return;
 				}
 				else{
+					select_dir = (fileList[i].getElementsByTagName("span")[0]).innerText;  //当前点击的文件名
 					fileShow(current_file);
 				}
             }

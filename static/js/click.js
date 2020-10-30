@@ -23,6 +23,15 @@ function stopPropagation(e) {
     }
 }
 
+// 转换字节
+function bytesToSize(bytes) {
+    if (bytes === 0) return '0 B';
+    let k = 1024,
+    sizes = ['B', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB'],
+    i = Math.floor(Math.log(bytes) / Math.log(k));
+    return (bytes / Math.pow(k, i)). toFixed(2) + ' ' + sizes[i];
+ }
+
 // 文件查看刷新
 function fileShow(ret) {
     let container = document.getElementsByClassName("content")[0],  //表格所在的区域
@@ -228,6 +237,7 @@ function fileShow(ret) {
 					return;
 				}
 				else{
+                    select_dir = (fileList[i].getElementsByTagName("span")[0]).innerText;  //当前点击的文件名
 					fileShow(current_file);
 				}
 			}
@@ -262,6 +272,7 @@ function fileShow(ret) {
 					return;
 				}
 				else{
+                    select_dir = (fileList[i].getElementsByTagName("span")[0]).innerText;  //当前点击的文件名
 					fileShow(current_file);
 				}
             }
@@ -385,7 +396,11 @@ function mousePos(e){
 }
 
 // 新建文件夹
-function newFile() {
+var newFile = function () {
+    // 回到顶部
+    $('html,body').animate({scrollTop: '0px'}, 800);
+    let con = document.getElementsByClassName("content")[0];
+    $(con).scrollTop(0);
     // 创建tbody格式
     let table = document.getElementsByTagName("table")[0];
     let tbody = document.createElement("tbody"),
@@ -513,14 +528,89 @@ function newFile() {
 
     // 取消按钮
     i2.onclick = function () {
-        window.location.reload();
+        fileShow(current_file);
     }
+
+    // 只执行一次新建函数,否则可以无限点击并出现多个输入框
+    newFile = function () {
+        new_input.focus();
+    };
+}
+
+// 文件上传进度
+function updateProgress(progress) {
+    let uploadList = document.getElementById("uploadList"),
+        len = uploadList.children.length;
+    let process = document.getElementsByClassName("process")[len-1],
+        status = document.getElementsByClassName("file-status")[len];
+    if (progress.lengthComputable) {
+        console.log("loaded:" + progress.loaded, "total:" + progress.total);
+        let upload_progress = (progress.loaded / progress.total) * 100;
+        upload_progress = Math.round(upload_progress);
+        console.log("upload_progress:" + upload_progress);
+        process.style.width = String(upload_progress) + "%";
+        if (upload_progress == 100) {
+            status.innerText = "上传成功";
+            status.style.color = "#9a079a";
+        }
+    }
+}
+
+// 上传列表
+function newUploadli(name, size, dir) {
+    let uploadList = document.getElementById("uploadList");
+    let li = document.createElement("li"),
+        div_pro = document.createElement("div"),
+        div_info = document.createElement("div"),
+        div_name = document.createElement("div"),
+        div_size = document.createElement("div"),
+        div_path = document.createElement("div"),
+        div_sta = document.createElement("div"),
+        div_ope = document.createElement("div"),
+        em1 = document.createElement("em"),
+        em2 = document.createElement("em");
+
+    li.className = "status";
+    div_pro.className = "process";
+    div_info.className = "file-info";
+    div_name.className = "file-name";
+    div_size.className = "file-size";
+    div_path.className = "file-path";
+    div_sta.className = "file-status";
+    div_ope.className = "file-operate";
+    em1.className = "continue";
+    em2.className = "remove";
+
+    div_name.innerText = name;
+    div_size.innerText = size;
+    div_path.innerText = dir;
+    div_sta.innerText = "正在上传";
+
+    div_ope.appendChild(em1);
+    div_ope.appendChild(em2);
+    div_info.appendChild(div_name);
+    div_info.appendChild(div_size);
+    div_info.appendChild(div_path);
+    div_info.appendChild(div_sta);
+    div_info.appendChild(div_ope);
+    li.appendChild(div_pro);
+    li.appendChild(div_info);
+    uploadList.appendChild(li);
 }
 
 // 上传文件
 function uploadFile() {
+    current_file = ".";
     let form_data = new FormData(document.getElementById('filename'));
     console.log(form_data.get("uploadfile"));
+    let input_obj = document.getElementById('file'),
+        file_name = input_obj.files[0].name,
+        file_size = bytesToSize(input_obj.files[0].size),
+        dir = select_dir;
+    console.log("file_name:" + file_name);
+    console.log("file_size:" + file_size);
+    console.log("dir:" + dir);
+    newUploadli(file_name, file_size, dir);
 
     let ret = confirm("是否将该文件上传至当前目录？");
     if (ret) {
@@ -531,11 +621,25 @@ function uploadFile() {
                 type: "POST",
                 cache: false,
                 processData: false,
-                contentType: false,
+                contentType: false, //必须false才会自动加上正确的Content-Type
+                //这里我们先拿到jQuery产生的 XMLHttpRequest对象，为其增加 progress 事件绑定，然后再返回交给ajax使用
+                xhr: function () {
+                    let xhr = $.ajaxSettings.xhr();
+                    if (xhr.upload) {
+                        console.log("xhr.upload")
+                        xhr.upload.onprogress = function (progress) {
+                            self.updateProgress(progress);
+                        };
+                        xhr.upload.onloadstart = function () {
+                            console.log('started...');
+                        };
+                    }
+                    return xhr;
+                },
                 success: function (data) {
                     if (data) {
                         console.log("Upload file: success!");
-                        window.location.reload();
+                        fileShow(current_file);
                         return true;
                     }
                     else {
@@ -643,4 +747,15 @@ function downloadFile() {
 
     let form_data = new FormData(form);
     form.submit();
+}
+
+// 缩小或放大下载框
+function changeSize() {
+    let progress = document.getElementsByClassName("progress")[0],
+        emsize = progress.getElementsByTagName("em")[2],
+        close = progress.getElementsByClassName("closesize")[0];
+    progress.style.height = progress.style.height == "300px" ? "50px" : "300px";
+    emsize.className = emsize.className == "minsize" ? "maxsize" : "minsize";
+   
+
 }
