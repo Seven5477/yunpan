@@ -3,6 +3,8 @@ let select_file = "";  //选中的文件
 let select_dir = "";  //当前目录
 let select_list = [];  //选中的文件数组
 let flag = false;  //输入框函数是否成功调用
+let request = null;
+let newClick = false;
 
 // 登录成功后进入用户主界面
 function loadPage() {

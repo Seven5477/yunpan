@@ -4,6 +4,7 @@ var host = "localhost:9090";
 var login_href = "http://" + host + "/login",
     regist_href = "http://" + host + "/regist",
     index_href = "http://" + host + "/index",
+    share_href = "http://" + host + "/share",
     logout_href = "http://" + host + "/logout";
 
 // url
@@ -14,3 +15,5 @@ var login_rpc = "http://" + host + "/login_auth",
     upload_rpc = "http://" + host + "/upload",
     download_rpc = "http://" + host + "/download",
     upload_rpc = "http://" + host + "/upload";
+
+const chunkSize = 1024 * 1024;

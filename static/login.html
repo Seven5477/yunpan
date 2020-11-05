@@ -6,6 +6,7 @@
         <link rel="stylesheet" href="./static/css/login.css">
         <script src="./static/js/jquery.min.js"></script>
         <script src="./static/js/global.js"></script>
+        <script src="./static/js/md5.js"></script>
         <title>Sault</title>
     </head>
     <body onkeydown="keyLogin();">
@@ -55,7 +56,7 @@
         function login() {
             let username = document.getElementsByName("username")[0].value,
                 password = document.getElementsByName("password")[0].value;
-            let login_data = "{\"username\""+ ":\"" + username + "\"," + "\"password\"" + ":\"" + password + "\"}";
+            let login_data = "{\"username\""+ ":\"" + username + "\"," + "\"password\"" + ":\"" + b64_md5(password) + "\"}";
             console.log(username + " " + password);
             $.ajax(
                 {

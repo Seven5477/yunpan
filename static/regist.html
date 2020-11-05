@@ -6,6 +6,7 @@
         <link rel="stylesheet" href="./static/css/regist.css">
         <script src="./static/js/jquery.min.js"></script>
         <script src="./static/js/global.js"></script>
+        <script src="./static/js/md5.js"></script>
         <title>Sault</title>
     </head>
     <body>
@@ -80,7 +81,6 @@
             error = document.getElementsByClassName("error")[0];
 
         function change() {
-            console.log("change")
             error.style.display = "none";
         }
         
@@ -98,7 +98,7 @@
         function regist() {
             let username = document.getElementsByName("Username")[0].value,
                 password = document.getElementsByName("Password")[0].value;
-            let regist_data = "{\"UserName\""+ ":\"" + username + "\"," + "\"PassWord\"" + ":\"" + password + "\"}";
+            let regist_data = "{\"UserName\""+ ":\"" + username + "\"," + "\"PassWord\"" + ":\"" + b64_md5(password) + "\"}";
             console.log(regist_data);
             $.ajax(
                 {

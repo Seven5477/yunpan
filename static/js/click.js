@@ -396,7 +396,17 @@ function mousePos(e){
 }
 
 // 新建文件夹
-var newFile = function () {
+function isNew() {
+    if(!newClick) {
+        newFile();
+    }
+    else{
+        let new_input = document.getElementsByClassName("new_input")[0];
+        new_input.focus();
+    }
+}
+function newFile() {
+    newClick = true;
     // 回到顶部
     $('html,body').animate({scrollTop: '0px'}, 800);
     let con = document.getElementsByClassName("content")[0];
@@ -524,17 +534,14 @@ var newFile = function () {
                     });
             }
         }
+        newClick = false;
     }
 
     // 取消按钮
     i2.onclick = function () {
         fileShow(current_file);
+        newClick = false;
     }
-
-    // 只执行一次新建函数,否则可以无限点击并出现多个输入框
-    newFile = function () {
-        new_input.focus();
-    };
 }
 
 // 文件上传进度
@@ -542,22 +549,30 @@ function updateProgress(progress) {
     let uploadList = document.getElementById("uploadList"),
         len = uploadList.children.length;
     let process = document.getElementsByClassName("process")[len-1],
-        status = document.getElementsByClassName("file-status")[len];
+        status = document.getElementsByClassName("file-status")[len],
+        operate = document.getElementsByClassName("file-operate")[len],
+        em1 = operate.getElementsByTagName("em")[0],
+        em2 = operate.getElementsByTagName("em")[1],
+        total = document.getElementsByClassName("total")[0];
     if (progress.lengthComputable) {
         console.log("loaded:" + progress.loaded, "total:" + progress.total);
         let upload_progress = (progress.loaded / progress.total) * 100;
-        upload_progress = Math.round(upload_progress);
-        console.log("upload_progress:" + upload_progress);
-        process.style.width = String(upload_progress) + "%";
+        let percent = upload_progress.toFixed(2) + "%";
+        console.log("percent:" + percent);
+        process.style.width = percent;
+        total.style.width = percent;
+        status.innerText = percent;
         if (upload_progress == 100) {
             status.innerText = "上传成功";
             status.style.color = "#9a079a";
+            // em1.className = "clear";
+            // operate.removeChild(operate.children[1]);
         }
     }
 }
 
-// 上传列表
-function newUploadli(name, size, dir) {
+// 上传/下载列表
+function newLoadli(name, size, dir) {
     let uploadList = document.getElementById("uploadList");
     let li = document.createElement("li"),
         div_pro = document.createElement("div"),
@@ -578,7 +593,7 @@ function newUploadli(name, size, dir) {
     div_path.className = "file-path";
     div_sta.className = "file-status";
     div_ope.className = "file-operate";
-    em1.className = "continue";
+    em1.className = "pause";
     em2.className = "remove";
 
     div_name.innerText = name;
@@ -599,7 +614,7 @@ function newUploadli(name, size, dir) {
 }
 
 // 上传文件
-function uploadFile() {
+function uploadFile1() {
     current_file = ".";
     let form_data = new FormData(document.getElementById('filename'));
     console.log(form_data.get("uploadfile"));
@@ -610,11 +625,12 @@ function uploadFile() {
     console.log("file_name:" + file_name);
     console.log("file_size:" + file_size);
     console.log("dir:" + dir);
-    newUploadli(file_name, file_size, dir);
+    newLoadli(file_name, file_size, dir);
+
 
     let ret = confirm("是否将该文件上传至当前目录？");
     if (ret) {
-        $.ajax(
+        request = $.ajax(
             {
                 url: upload_rpc,
                 data: form_data,
@@ -626,9 +642,10 @@ function uploadFile() {
                 xhr: function () {
                     let xhr = $.ajaxSettings.xhr();
                     if (xhr.upload) {
-                        console.log("xhr.upload")
+                        console.log("upload...")
                         xhr.upload.onprogress = function (progress) {
                             self.updateProgress(progress);
+                            if(((progress.loaded / progress.total) * 100) == 100);
                         };
                         xhr.upload.onloadstart = function () {
                             console.log('started...');
@@ -648,13 +665,82 @@ function uploadFile() {
                     }
                 },
                 error: function () {
-                    alert("Network error!")
+                    console.log("Network error!");
                 }
             });
     }
     else {
         return;
     }
+}
+
+function uploadFile(start) {
+    current_file = ".";   
+    let fileObj = document.getElementById('file').files[0];
+    // 上传完成
+    if (start >= fileObj.size) {
+        return;
+    }
+    // 获取文件块的终止字节
+    let end = (start + chunkSize > fileObj.size) ? fileObj.size : (start + chunkSize);
+
+    console.log("size:" + fileObj.size);
+    console.log("start:" + start);
+    console.log("end:" + end);
+
+    // 将文件切块上传
+    let form_data = new FormData(document.getElementById('filename'));
+    form_data.append('file', fileObj.slice(start, end));
+    // POST表单数据
+    // let xhr = new XMLHttpRequest();
+    // xhr.open('post', upload_rpc, true);
+    // xhr.onload = function() {
+    //     if (this.readyState == 4 && this.status == 200) {
+    //         // 上传一块完成后修改进度条信息，然后上传下一块
+    //         let progress = document.getElementsByClassName('total-process')[0];
+    //         progress.max = fileObj.size;
+    //         progress.value = end;
+    //         uploadFile(end);
+    //     }
+    // }
+    // xhr.send(form_data);
+    // POST表单数据
+    $.ajax({
+        url: upload_rpc,
+        data: form_data,
+        type: "POST",
+        cache: false,
+        processData: false,
+        contentType: false, //必须false才会自动加上正确的Content-Type
+        //这里我们先拿到jQuery产生的 XMLHttpRequest对象，为其增加 progress 事件绑定，然后再返回交给ajax使用
+        success: function() {
+            uploadFile(end);
+        }
+    });
+    if(end == fileObj.size) {
+        fileShow(current_file);
+    }
+}
+
+// 初始化上传大小
+function init() {
+    let fileObj = document.getElementById('file').files[0];
+    let xhr = new XMLHttpRequest();
+    xhr.onreadystatechange = function() {
+        if (this.readyState == 4 && this.status == 200) {
+            // 将字符串转化为整数
+            let start = parseInt(this.responseText);
+            // 设置进度条
+            let progress = document.getElementById('progress');
+            progress.max = fileObj.size;
+            progress.value = start;
+            // 开始上传
+            upload(start);
+        }
+    }
+    xhr.open('post', 'fileSize.php', true);
+    // 向服务器发送文件名查询大小
+    xhr.send(fileObj.name);
 }
 
 // 上传文件夹
@@ -749,13 +835,154 @@ function downloadFile() {
     form.submit();
 }
 
-// 缩小或放大下载框
-function changeSize() {
-    let progress = document.getElementsByClassName("progress")[0],
-        emsize = progress.getElementsByTagName("em")[2],
-        close = progress.getElementsByClassName("closesize")[0];
-    progress.style.height = progress.style.height == "300px" ? "50px" : "300px";
-    emsize.className = emsize.className == "minsize" ? "maxsize" : "minsize";
-   
+// 判断上传任务列表是否为空
+function isEmptyUpload() {
+    let uploadList = document.getElementById("uploadList"),
+        fileInfoList = uploadList.getElementsByClassName("file-info"),
+        len = fileInfoList.length,
+        nothing = document.getElementsByClassName("nothing")[0],
+        progress = document.getElementsByClassName("upload-progress")[0],
+        upload_img = nothing.getElementsByTagName("img")[0],
+        download_img = nothing.getElementsByTagName("img")[1],
+        info = nothing.getElementsByClassName("info")[0];
+    // 判断列表内是否有任务
+    if(len == 0) {
+        progress.style.display = "none";
+        nothing.style.display = "block";
+        upload_img.style.display = "";
+        download_img.style.display = "none";
+        info.innerText = "当前没有上传任务喔~";
+    }
+    else{
+        nothing.style.display = "none";
+        progress.style.display = "block";
+    }
+}
+
+// 判断下载任务列表是否为空
+function isEmptyDownload() {
+    let downloadList = document.getElementById("downloadList"),
+        fileInfoList = downloadList.getElementsByClassName("file-info"),
+        len = fileInfoList.length,
+        nothing = document.getElementsByClassName("nothing")[0],
+        progress = document.getElementsByClassName("download-progress")[0],
+        upload_img = nothing.getElementsByTagName("img")[0],
+        download_img = nothing.getElementsByTagName("img")[1],
+        info = nothing.getElementsByClassName("info")[0];
+    // 判断列表内是否有任务
+    if(len == 0) {
+        progress.style.display = "none";
+        nothing.style.display = "block";
+        upload_img.style.display = "none";
+        download_img.style.display = "";
+        info.innerText = "当前没有下载任务喔~";
+    }
+    else{
+        nothing.style.display = "none";
+        progress.style.display = "block";
+    }
+}
+
+// 跳转到传输列表
+function toTransport() {
+    let upload_module = document.getElementsByClassName("upload-progress")[0], //上传
+        uploadList = document.getElementById("uploadList"),
+        download_module = document.getElementsByClassName("download-progress")[0], //下载
+        downloadList = document.getElementById("downloadList"), 
+        nav_title = document.getElementsByClassName("nav-title")[0],
+        netdisk = nav_title.getElementsByTagName("li")[0],
+        transport = nav_title.getElementsByTagName("li")[1],
+        transport_content = document.getElementsByClassName("transport-content")[0],
+        main_content = document.getElementsByClassName("main-content")[0],
+        disk = document.getElementsByClassName("disk")[0],
+        trans = document.getElementsByClassName("trans")[0],
+        download = trans.getElementsByTagName("div")[0], //左侧下载菜单
+        upload = trans.getElementsByTagName("div")[1]; //左侧上传菜单
+    // 顶部导航的显示
+    main_content.style.display = "none";
+    disk.style.display = "none";
+    netdisk.className = "";
+    transport_content.style.display = "block";
+    trans.style.display = "block";
+    transport.className = "active";
+
+    isEmptyUpload();
+
+    // 点击下载
+    download.onclick = function () {
+        download.style.background = "#e2ddec";
+        upload.style.background = "#f8f7f7";
+        upload_module.style.display = "none"
+        download_module.style.display = "block";
+        isEmptyDownload();
+    }
+
+    // 点击上传
+    upload.onclick = function () {
+        upload.style.background = "#e2ddec";
+        download.style.background = "#f8f7f7";
+        download_module.style.display = "none";
+        upload_module.style.display = "block";
+        isEmptyUpload();
+    }
+
+    // let liList = uploadList.getElementsByTagName("li"),
+    //     total = document.getElementsByClassName("total")[0],
+    //     operationList = document.getElementsByClassName("file-operate"),
+    //     opeLen = operationList.length;
+    // (function () {
+    //     for (let i = 1; i < opeLen; i++) {
+    //         let em_btn = operationList[i].getElementsByTagName("em")[0],
+    //             em_cancel = operationList[i].getElementsByTagName("em")[1];
+    //         // 点击暂停/继续图标
+    //         em_btn.onclick = function () {
+    //             em_btn.className = em_btn.className == "continue" ? "pause" : "continue";
+    //             // 如果当前为暂停图标
+    //             if(em_btn.className == "pause") {
+    //                 em_btn.className = "continue";
+
+    //             }
+    //             // 如果当前为继续图标
+    //             else{
+    //                 em_btn.className = "pause";
+    //             }
+    //         }
+    //         // 点击移除图标
+    //         em_cancel.onclick = function () {
+    //             console.log("cancel...");
+    //             uploadList.removeChild(uploadList.children[i-1]);
+    //             total.style.width = 0;
+    //             request.abort();
+    //             isEmpty(1);
+    //         }
+    //     }
+    // })();
+}
+
+// 跳转到我的网盘
+function toDisk() {
+    let nav_title = document.getElementsByClassName("nav-title")[0],
+        netdisk = nav_title.getElementsByTagName("li")[0],
+        transport = nav_title.getElementsByTagName("li")[1],
+        transport_content = document.getElementsByClassName("transport-content")[0],
+        main_content = document.getElementsByClassName("main-content")[0],
+        disk = document.getElementsByClassName("disk")[0],
+        trans = document.getElementsByClassName("trans")[0];
+    main_content.style.display = "block";
+    disk.style.display = "block";
+    netdisk.className = "active";
+    transport_content.style.display = "none";
+    trans.style.display = "none";
+    transport.className = "";
+}
+
+// 全部暂停下载
+function pauseList() {
+    let pause = document.getElementsByClassName("total-pause")[0];
+    pause.innerText = pause.innerText == "全部暂停" ? "全部开始" : "全部暂停";
+}
+
+// 全部取消下载
+function cancelList() {
 
 }

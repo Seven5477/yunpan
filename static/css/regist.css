@@ -39,7 +39,7 @@ input{
     margin: 0 auto;
 }
 input[type="text"], input[type="password"]{
-    border: 1px solid #dcdfe6;
+    border: 1px solid #97a1b7;
     width: 100%;
     box-sizing: border-box;
     border-radius: 4px;
@@ -68,7 +68,7 @@ input[type="text"]:focus, input[type="password"]:focus{
 }
 .form-area .select .select-item{
     width: 140px;
-    border: 1px solid #dcdfe6;
+    border: 1px solid #97a1b7;
     border-radius: 4px 0 0 4px;
     border-right: none;
     box-sizing: border-box;

@@ -27,7 +27,7 @@ body{
 .top .logo{
     height: 60px;
     line-height: 60px;
-    width: 200px;
+    width: 166px;
     margin: 10px 60px;
 }
 .top .logo img{
@@ -44,23 +44,29 @@ body{
     background: #b8b6bd;
 }
 /* 选项 */
-.top .title{
-    width: 300px;
+.top .nav-title{
+    width: 440px;
     height: 60px;
     margin: 10px 30px;
 }
-.top .title li{
+.top .nav-title li{
     float: left;
-    width: 60px;
+    width: 79px;
     height: 40px;
     text-align: center;
-    margin: 10px 10px;
+    margin: 10px 30px;
 }
-.top .title li a{
-    font-size: 19px;
-    color: #1f77a6;
+.top .nav-title li.active{
+   border-bottom: 2px solid #946ae0;
+}
+.top .nav-title li a{
+    font-size: 18px;
+    color: #424e67;
     line-height: 40px;
 }
+.top .nav-title li.active a, .top .nav-title li:hover a{
+    color: #946ae0;
+ }
 /* 用户 */
 .top .user-logout{
     width: 250px;
@@ -98,6 +104,7 @@ body{
     width: 171px;
     height: 600px;
     background: #f8f7f7;
+    border-right: 1px solid #e0e0e0;
 }
 .main .left .title{
     height: 40px;
@@ -110,7 +117,11 @@ body{
     margin-left: -24px;
 }
 .main .left .title:hover{
-    background: #f2eded;
+    background: #ece9f1;
+    color: #3b97b7;
+}
+.main .left div.active{
+    background: #e2ddec;
     color: #3b97b7;
 }
 .main .left .title a{
@@ -125,11 +136,11 @@ body{
 }
 /* 正文右侧 */
 .main .right{
-    margin-left: 15px;
     width: 987px;
     position: relative;
 }
 .main .right .features {
+    margin-left: 15px;
     height: 66px;
 }
 .main .right .features>ul>li{
@@ -169,6 +180,7 @@ body{
     height: 20px;
     padding-left: 5px;
     margin-top: 5px;
+    margin-left: 15px;
 }
 .main .right .return .last_file{
     cursor: pointer;
@@ -184,9 +196,9 @@ body{
 }
 /* 表格 */
 .main .right .content{
-    margin-top: 15px;
+    margin: 15px 0px 0px 15px;
     margin-bottom: 10px;
-    height: 460px;
+    height: 470px;
     overflow: auto;
 }
 .content::-webkit-scrollbar {
@@ -218,202 +230,6 @@ body{
     padding: 0 10px 0 5px;
     text-align: left;
     font-size: 14px;
-}
-/* 进度条 */
-.main .right .progress{
-    width: 530px;
-    background-color: #fff;
-    border-top-left-radius: 7px;
-    border-top-right-radius: 7px;
-    border: 1px solid #e2e2e2;
-    box-shadow: 0 0 10px #ccc;
-    position: absolute;
-    bottom: -24px;
-    right: 25px;
-    overflow: hidden;
-}
-.main .right .progress .head{
-    position: relative;
-    height: 44px;
-    line-height: 44px;
-    font-weight: 200;
-}
-.main .right .progress .head h3{
-    display: block;
-    height: 42px;
-    line-height: 42px;
-    text-indent: 1em;
-    font-size: 14px;
-    font-weight: 700;
-    color: #4d4d4d;
-    border-bottom: 1px solid #f2f6fd;
-}
-.main .right .progress .head h3 .head-title{
-    display: block;
-    margin-right: 50px;
-    white-space: nowrap;
-    text-overflow: ellipsis;
-    color: #666;
-}
-.main .right .progress .head h3 .head-title em{
-    font-style: normal;
-    cursor: text;
-    font-weight: 200;
-}
-.main .right .progress .head .control{
-    position: absolute;
-    right: 10px;
-    top: 10px;
-    height: 20px;
-}
-.main .right .progress .head .control em{
-    cursor: pointer;
-    float: right;
-    margin: 0 6px;
-}
-.main .right .progress .head .control .closesize{
-    background: url(../imgs/remove.png);
-    background-repeat: no-repeat;
-    background-size: 65% 65%;
-    margin-top: 4px;
-    width: 18px;
-    height: 18px;
-}
-.main .right .progress .head .control .minsize{
-    background: url(../imgs/min.png);
-    background-repeat: no-repeat;
-    background-size: 100% 100%;
-    margin-top: 1px;
-    width: 18px;
-    height: 18px;
-}
-.main .right .progress .head .control .maxsize{
-    background: url(../imgs/max.png);
-    background-repeat: no-repeat;
-    background-size: 100% 100%;
-    margin-top: 1px;
-    width: 18px;
-    height: 18px;
-}
-.main .right .progress .body{
-    line-height: 24px;
-    position: relative;
-}
-.main .right .progress .body .upload-info{
-    overflow: hidden;
-    height: 35px;
-    font-size: 12px;
-    border-bottom: 1px solid #f2f6fd;
-    line-height: 35px;
-    color: #424e67;
-    /* display: none; */
-}
-.main .right .progress .body .file-name{
-    float: left;
-    overflow: hidden;
-    width: 43%;
-    white-space: nowrap;
-    text-indent: 16px;
-    text-overflow: ellipsis;
-}
-.main .right .progress .body .file-size{
-    float: left;
-    width: 16%;
-    text-indent: 10px;
-}
-.main .right .progress .body .file-path{
-    float: left;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-    width: 13%;
-}
-.main .right .progress .body .file-status{
-    float: left;
-    width: 18%;
-}
-.main .right .progress .body .file-operate{
-    float: left;
-    width: 10%;
-}
-.main .right .progress .body .file-operate em{
-    float: left;
-    width: 16px;
-    height: 16px;
-    cursor: pointer;
-}
-.main .right .progress .body .file-operate .pause{
-    background: url(../imgs/pause.png);
-    background-repeat: no-repeat;
-    background-size: 75% 75%;
-    margin-top: 19px;
-
-}
-.main .right .progress .body .file-operate .continue{
-    background: url(../imgs/continue.png);
-    background-repeat: no-repeat;
-    background-size: 75% 75%;
-    margin-top: 19px;
-}
-.main .right .progress .body .file-operate .remove{
-    background: url(../imgs/remove.png);
-    background-repeat: no-repeat;
-    background-size: 66% 66%;
-    margin-top: 19.5px;
-}
-.main .right .progress .body .upload-error{
-    width: 100%;
-    height: 35px;
-    line-height: 35px;
-    color: #fff;
-    font-size: 12px;
-    background: #b2daee;
-    overflow: hidden;
-    color: #424e67;
-    display: none;
-}
-.main .right .progress .body .upload-error .info{
-    overflow: hidden;
-    width: 72%;
-    text-indent: 15px;
-    text-overflow: ellipsis;
-}
-.main .right .progress .body .upload-error em{
-    position: absolute;
-    font-size: 15px;
-    top: 0;
-    right: 15px;
-    font-style: normal;
-    cursor: pointer;
-    line-height: 34px;
-}
-.main .right .progress .body .upload-list{
-    overflow: hidden;
-    overflow-y: auto;
-    height: 349px;
-    margin-top: -1px;
-}
-.main .right .progress .body .upload-list ul{
-    overflow: hidden;
-    color: #666;
-    font-size: 12px;
-}
-.main .right .progress .body .upload-list ul .status{
-    position: relative;
-    height: 49px;
-    border-bottom: 1px solid #f2f6fd;
-    line-height: 49px;
-}
-.main .right .progress .body .upload-list ul .status .process{
-    position: absolute;
-    z-index: 0;
-    height: 100%;
-    background: #e6edf8;
-}
-.main .right .progress .body .upload-list ul .status .file-info{
-    position: absolute;
-    width: 100%;
-    height: 100%;
 }
 .file_name{
     padding-left: 30px;
