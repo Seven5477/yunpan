@@ -66,14 +66,14 @@
                     async: false,
                     success: function(data)
                     {
-                        if(data){
-                            console.log(data);
+                        if(data.code == 1000){
+                            console.log(data.description);
                             window.location.href = index_href;
                             window.localStorage.setItem('user',username);
                             return true;
                         }
                         else{
-                            alert("用户名密码错误");
+                            alert(data.description);
                             return false;
                         }
                     },

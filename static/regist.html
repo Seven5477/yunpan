@@ -108,13 +108,13 @@
                     async: false,
                     success: function(data)
                     {
-                        if(data){
-                            console.log(data);
+                        if(data.code == 1000){
+                            console.log(data.description);
                             window.location.href = login_href;
                             return true;
                         }
                         else{
-                            alert("注册失败");
+                            alert(data.description);
                             return false;
                         }
                     },

@@ -228,7 +228,7 @@
 .main .right .body .load-list ul .status{
     position: relative;
     height: 49px;
-    border-bottom: 1px solid #f2f6fd;
+    border-bottom: 2px solid #f2f6fd;
     line-height: 49px;
 }
 .main .right .body .load-list ul .status .process{

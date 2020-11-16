@@ -6,11 +6,11 @@
     <link rel="stylesheet" href="./static/css/reset.css">
     <link rel="stylesheet" href="./static/css/index.css">
     <link rel="stylesheet" href="./static/css/transport.css">
-    <link rel="stylesheet" href="./static/css/iconfont.css">
     <script src="./static/js/jquery.min.js"></script>
     <script src="./static/js/global.js"></script>
     <script src="./static/js/index.js"></script>
     <script src="./static/js/click.js"></script>
+    <script src="./static/js/md5.js"></script>
     <title>Sault</title>
 </head>
 <body onload="loadPage()">
@@ -44,8 +44,8 @@
             <!-- 左侧标题 -->
             <!-- 网盘 -->
             <div class="left disk fl">
-                <div class="title" style="margin-top: 20px;">
-                    <i class="iconfont icon-wenjian"></i>
+                <div class="title active" style="margin-top: 20px;">
+                    <i class="disk-iconfont1"></i>
                     <a href="#">全部文件</a>
                 </div>
                 <div class="title">
@@ -58,18 +58,18 @@
                     <a href="#">音频</a>
                 </div>
                 <div class="title">
-                    <i class="iconfont icon-huishouzhan_huaban"></i>
+                    <i class="disk-iconfont2"></i>
                     <a href="#">回收站</a>
                 </div>
             </div>
             <!-- 传输列表 -->
             <div class="left trans fl" style="display: none;">
                 <div class="title" style="margin-top: 20px;">
-                    <i class="iconfont icon-download"></i>
+                    <i class="iconfont"></i>
                     <a href="#">正在下载</a>
                 </div>
                 <div class="title active">
-                    <i class="iconfont icon-shangchuan"></i>
+                    <i class="iconfont"></i>
                     <a href="#">正在上传</a>
                 </div>
                 <!-- <div class="title">
@@ -86,42 +86,57 @@
                             <!-- 上传 -->
                             <li class="upload">
                                 <div class="feature_one">
-                                    <i class="iconfont icon-shangchuan"></i>
+                                    <i class="iconfont-upload"></i>
                                     <button>上传</button>
                                 </div>
                                 <ul class="upload_file">
                                     <form method="post" id="filename" name="filename" enctype="multipart/form-data">
                                         <label for="file">
                                             <input type="file" id="file" name="uploadfile" 
-                                                style="display: none;" onchange="uploadFile(0)">
+                                                style="display: none;" onchange="upload()">
                                                 <li class="file">上传文件</li>
                                         </label>
                                     </form>
                                     <form method="post" id="filesname" name="filesname" enctype="multipart/form-data">
-                                        <label for="files">
-                                            <input type="file" id="files" name="uploadfile" webkitdirectory=""
-                                                style="display: none;" onchange="uploadFiles()">
+                                        <label for="folder">
+                                            <input type="file" id="folder" name="uploadfile" webkitdirectory
+                                                style="display: none;" onclick="uploadDir()">
                                                 <li class="file">上传文件夹</li>
                                         </label>
                                     </form>
                                 </ul>
                             </li>
                             <!-- 新建文件夹 -->
-                            <li class="new">
-                                <i class="iconfont icon-xinjianwenjianjia"></i>
-                                <button onclick="isNew()">新建文件夹</button>
+                            <li class="new" onclick="isNew()">
+                                <i class="iconfont-newdir"></i>
+                                <button>新建文件夹</button>
                             </li>
-                            <!-- 离线下载 -->
-                            <li class="download">
-                                <i class="iconfont icon-download"></i>
-                                <button onclick="downloadFile()">离线下载</button>
+                            <!-- 刷新 -->
+                            <li class="refresh"  onclick="refresh()">
+                                <i class="iconfont-refresh"></i>
+                                <button>刷新</button>
+                            </li>
+                            <!-- 更多按钮 -->
+                            <div class="more">
+                                <li onclick="downloadFile()">
+                                    <i class="iconfont-download"></i>
+                                    <button>下载</button>
+                                </li>
+                                <li onclick="deleteFile()">
+                                    <i class="iconfont-delete"></i>
+                                    <button>删除</button>
+                                </li>
+                                <li onclick="shareFile()">
+                                    <i class="iconfont-share"></i>
+                                    <button>分享</button>
+                                </li>
                             </li>
                         </ul>
                     </div>
                     <!-- 返回上一级 -->
                     <div class="return">
                         <span class="last_file" onclick="returnFile()">返回上一级</span>
-                        <span class="file_system">全部文件>test>1.jpg</span>
+                        <span class="file_system"></span>
                     </div>
                     <!-- 文件目录和详情 -->
                     <div class="content">
@@ -164,7 +179,7 @@
                                 <div class="head-title">
                                     <span class="select-text">上传总进度</span>
                                     <div class="total-process">
-                                        <span class="total" style="width: 70%;"></span>
+                                        <span class="total" style="width: 0;"></span>
                                     </div>
                                 </div>
                             </h3>
@@ -190,9 +205,9 @@
                             <!-- 上传的文件目录 -->
                             <div class="load-list">
                                 <ul id="uploadList">
-                                    <li class="status">
+                                    <!-- <li class="status"> -->
                                         <!-- 背景进度 -->
-                                        <div class="process"></div>
+                                        <!-- <div class="process"></div>
                                         <div class="file-info">
                                             <div class="file-name">nand-ipq807x_64-apps(3).img</div>
                                             <div class="file-size">34.8M</div>
@@ -202,8 +217,8 @@
                                                 <em class="continue"></em>
                                                 <em class="remove"></em>
                                             </div>
-                                        </div>
-                                    </li>
+                                        </div> -->
+                                    <!-- </li> -->
                                 </ul>
                             </div>
                         </div>
