@@ -18,24 +18,13 @@
 </style>
 <script>
     function refresh() {
-        let icon_refresh = document.getElementsByClassName("iconfont-refresh")[0],
-            rotateval = 0;
-        function test() {
-            rotateval = rotateval + 1;
-            if(rotateval === 360) {
-                clearInterval(interval);
-                rotateval = 0;
-            }
-            icon_refresh.style.transform = 'rotate('+rotateval+'deg)';
-        }
-        let interval = setInterval(test, 10);
-        
+        window.getSelection ? window.getSelection().removeAllRanges() : document.selection.empty();
     }
 </script>
 <body>
     <li>
         <i class="iconfont-refresh"></i>
-        <button onclick="refresh()">刷新</button>
+        <div onclick="refresh()" style="-moz-user-select:none;" onselectstart="return false">刷新刷新刷新刷新刷新</div>
     </li>
 </body>
 

@@ -324,6 +324,7 @@ body{
     height: 40px;
     line-height: 40px;
     border-bottom: 1px solid #eeeeee;
+    -moz-user-select:none;
 }
 .main .right .content table .trstyle:hover{
     background: #e8f6fd;

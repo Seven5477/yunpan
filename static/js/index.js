@@ -250,7 +250,7 @@ function loadPage() {
 		trList[0].style.background = "none";
 	};
 
-	// 鼠标停留/离开时显示操作图标
+	// 鼠标停留/离开时显示/隐藏每行的操作图标
 	let iconList = document.getElementsByClassName("div_icon");
 	(function () {
         for (let i = 1; i < trList.length; i++) {
@@ -466,6 +466,11 @@ function loadPage() {
 	html.onclick = function(e) {
 		stopPropagation(e);
 		menu.style.display = 'none';
+	}
+
+	// 整个页面禁止双击选中文字
+	document.onselectstart =function(){
+		return false;
 	}
 
 	// 鼠标经过上传按钮
