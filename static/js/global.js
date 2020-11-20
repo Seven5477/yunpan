@@ -36,7 +36,7 @@ var current_file = ".";  //当前所在的文件夹
     request = null, //上传请求，用于暂停
     eObj =  {
         length: 0
-    }; //存储
+    }; //存储绑定的e对象
     formObj =  {
         length: 0
     }; //存储每次点击上传文件里的文件的formdata信息
@@ -45,6 +45,8 @@ var current_file = ".";  //当前所在的文件夹
     }; //存储每次点击上传文件里的文件
     obj_index = 0; //fileObj的索引属性
     end_last = true; //上一个文件上传结束的标识
+    end_lastLi = true;
+    indexLi = 0; //上传列表的索引
 
     /*上传文件夹需要的变量*/
     file_arr = null, //文件夹的文件数组

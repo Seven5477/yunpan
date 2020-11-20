@@ -20,9 +20,29 @@ function validateFileName(fileName) {
     return true;
 }
 
+function addLi(i) {
+    let file = null;
+    let index = i;
+    if(upload_type === 1) {
+        file = fileObj[index];
+    }
+    else{
+        file = file_arr[index];
+    }
+    let file_name = file.name,
+        file_size = bytesToSize(file.size),
+        dir = localStorage.getItem("select_dir");
+    console.log("file_name:" + file_name);
+    console.log("fileSize:" + file_size);
+    console.log("dir:" + dir);
+    newLoadli(file_name, file_size, dir);
+    end_lastLi = true;
+    indexLi++;
+}
+
 /* 计算文件的MD5值
 *  @params
-*      i 当前绑定的e的索引 obj 当前文件  
+*      index 当前索引(eObj,fileObj,file_arr) 
 *  @return 
 */
 function getFileMd5(index) {
@@ -34,13 +54,12 @@ function getFileMd5(index) {
     else{
         file = file_arr[index];
     }
-    console.log(e)
-    console.log(file)
+    console.log(file.name + " 计算中......");
+
     let fileReader = new FileReader(),
         box = document.getElementById('file_md5');
     blobSlice = File.prototype.mozSlice || File.prototype.webkitSlice || File.prototype.slice,
         chunk_size = 2097152,
-        // read in chunks of 2MB
         chunks = Math.ceil(file.size / chunk_size),
         currentChunk = 0,
         spark = new SparkMD5();
@@ -972,7 +991,7 @@ function chunk(fileSize) {
 function updateProgress(progress) {
     let uploadList = document.getElementById("uploadList"),
         len = uploadList.children.length;
-    let process = document.getElementsByClassName("process")[len-1],
+    let process = document.getElementsByClassName("process")[obj_index], //li对应的进度标签
         status = document.getElementsByClassName("file-status")[len],
         operate = document.getElementsByClassName("file-operate")[len],
         em1 = operate.getElementsByTagName("em")[0],
@@ -1021,24 +1040,23 @@ function upload(e) {
     formObj = addFileObj(form_info, formObj);
     fileObj = addFileObj(file_one, fileObj);
     eObj = addFileObj(e, eObj);
-    if(end_last) {
-        end_last = false;
-        getFileMd5(0);
+    if(end_lastLi) {
+        end_lastLi = false;
+        addLi(indexLi);
+        if(end_last) { //上一个任务结束了才开始当前任务
+            end_last = false;
+            getFileMd5(0);
+        }
     }   
 }
 
 /* 续传文件
 *  @params
+        index 任务列表索引
 *  @return
 */
 function reUpload(index) {
-    let file_name = null;
-    if(upload_type === 1) {
-        file_name = fileObj[index].name;
-    }
-    else{
-        file_name = file_arr[index].name;
-    }
+    let file_name = fileObj[index].name;
 
     let upload_data = "{\"Option\"" + ":" + "\"" + "reUploadFile" + "\"" + "," + "\"FileName\"" + ":" + "\"" + file_name + "\"" + "," + "\"Size\"" + ":" + "\"" + fileSize + "\"" + "," + "\"ChunkNum\"" + ":" + "\"" + chunkNum + "\"" + "," + "\"MD5\"" + ":" + "\"" + md5_file + "\"" + "," + "\"ChunkPos\"" + ":" + "\"" + chunkNum_uploaded + "\"" + "}";
     console.log(upload_data);
@@ -1068,6 +1086,7 @@ function reUpload(index) {
 
 /* 取消上传文件
 *  @params
+        index 任务列表索引
 *  @return
 */
 function cancelUpload(index) {
@@ -1238,24 +1257,14 @@ function uploadDir() {
 function uploadEver(index) {
     if(upload_type === 1) {
         file_obj = fileObj[index];
-        // let uploadList = document.getElementById("uploadList");
-        // if(uploadList.children[index+1]) {
-        //     uploadList.removeChild(uploadList.children[index+1]);
-        // }
     }
     else{
         file_obj = file_arr[index];
     }
-    console.log(file_obj)
-    let file_name = file_obj.name,
-        file_size = bytesToSize(file_obj.size),
-        dir = localStorage.getItem("select_dir");
-        fileSize = file_obj.size;
     console.log(file_obj);
-    console.log("file_name:" + file_name);
-    console.log("fileSize:" + fileSize);
-    console.log("dir:" + dir);
-    newLoadli(file_name, file_size, dir);
+    fileSize = file_obj.size;
+    let file_name = file_obj.name,
+        file_size = bytesToSize(file_obj.size);
 
     chunkSize = chunk(fileSize);
     chunkNum = Math.ceil(fileSize / chunkSize);
