@@ -38,6 +38,20 @@ function addLi(i) {
     newLoadli(file_name, file_size, dir);
     end_lastLi = true;
     indexLi++;
+    if(upload_type === 1) {
+        if(end_last) { //上一个任务结束了才开始当前任务
+            end_last = false;
+            getFileMd5(0);
+        }
+    }
+    else{
+        if(indexLi >= file_arr.length) {
+            getFileMd5(0);
+        }
+        else{
+            addLi(indexLi);
+        }
+    }
 }
 
 /* 计算文件的MD5值
@@ -390,6 +404,10 @@ function fileShow(ret) {
         }
     })();
 
+    if(checkList[0].checked) {
+        checkList[0].checked = false;
+    }
+
     // 鼠标划过第一行不变换背景色
 	trList[0].onmousemove = function () {
 		trList[0].style.background = "none";
@@ -689,7 +707,7 @@ function checkSelect() {
 		fileList = document.getElementsByClassName("file_name"),
 		checkLen = checkList.length,
 		fileLen = fileList.length;
-    for (let i = 0; i < checkLen; i++) {
+    for (let i = 1; i < checkLen; i++) {
         if(checkList[i].checked) {
             addList(fileList[i-1].innerText);
         }
@@ -990,10 +1008,18 @@ function chunk(fileSize) {
 */
 function updateProgress(progress) {
     let uploadList = document.getElementById("uploadList"),
-        len = uploadList.children.length;
-    let process = document.getElementsByClassName("process")[obj_index], //li对应的进度标签
-        status = document.getElementsByClassName("file-status")[len],
-        operate = document.getElementsByClassName("file-operate")[len],
+        len = uploadList.children.length,
+        thisIndex = 0, //索引
+        total_proc = 0; //总进度
+    if(upload_type === 1) {
+        thisIndex = obj_index;
+    }
+    else{
+        thisIndex = file_index;
+    }
+    let process = uploadList.getElementsByClassName("process")[thisIndex], //li对应的进度标签
+        status = uploadList.getElementsByClassName("file-status")[thisIndex],
+        operate = uploadList.getElementsByClassName("file-operate")[thisIndex],
         em1 = operate.getElementsByTagName("em")[0],
         em2 = operate.getElementsByTagName("em")[1],
         total = document.getElementsByClassName("total")[0];
@@ -1005,18 +1031,20 @@ function updateProgress(progress) {
         console.log("percent:" + percent);
         process.style.width = percent; //每个文件的进度
         status.innerText = percent; //每个文件的进度值
-        total_percent[file_index] = process_global.toFixed(2);
-        let len = null;
-            total_proc = 0; //总进度
-        if(file_arr) { //上传文件夹
-            len = file_arr.length;
+        total_percent[thisIndex] = process_global.toFixed(2);
+        if(upload_type === 2) { //上传文件夹
+            let len = file_arr.length;
             for(let i = 0; i < total_percent.length; i++) {
                 let sum = total_percent[i] / len;
                 total_proc += sum;
             }
         }
         else{ //上传文件
-            total_proc = process_global;
+            let len = fileObj.length;
+            for(let i = 0; i < total_percent.length; i++) {
+                let sum = total_percent[i] / len;
+                total_proc += sum;
+            }
         }
         console.log("total_percent:" + Math.round(total_proc));
         total.style.width = Math.round(total_proc) + "%"; //总进度
@@ -1043,10 +1071,6 @@ function upload(e) {
     if(end_lastLi) {
         end_lastLi = false;
         addLi(indexLi);
-        if(end_last) { //上一个任务结束了才开始当前任务
-            end_last = false;
-            getFileMd5(0);
-        }
     }   
 }
 
@@ -1245,7 +1269,8 @@ function uploadDir() {
                 alert("Network error!")
             }
         });
-        getFileMd5(0);
+        indexLi = 0;
+        addLi(indexLi);
     });
 }
 
