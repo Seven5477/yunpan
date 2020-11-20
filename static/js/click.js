@@ -26,8 +26,6 @@ function validateFileName(fileName) {
 *  @return 
 */
 function getFileMd5(index) {
-    console.log("!!!!!=======-=================")
-    console.log(index)
     let e = eObj[index];
     let file = null;
     if(upload_type === 1) {
@@ -1034,7 +1032,13 @@ function upload(e) {
 *  @return
 */
 function reUpload(index) {
-    let file_name = fileObj[index].name;
+    let file_name = null;
+    if(upload_type === 1) {
+        file_name = fileObj[index].name;
+    }
+    else{
+        file_name = file_arr[index].name;
+    }
 
     let upload_data = "{\"Option\"" + ":" + "\"" + "reUploadFile" + "\"" + "," + "\"FileName\"" + ":" + "\"" + file_name + "\"" + "," + "\"Size\"" + ":" + "\"" + fileSize + "\"" + "," + "\"ChunkNum\"" + ":" + "\"" + chunkNum + "\"" + "," + "\"MD5\"" + ":" + "\"" + md5_file + "\"" + "," + "\"ChunkPos\"" + ":" + "\"" + chunkNum_uploaded + "\"" + "}";
     console.log(upload_data);
@@ -1066,8 +1070,16 @@ function reUpload(index) {
 *  @params
 *  @return
 */
-function cancelUpload() {
-    let upload_data = "{\"Option\"" + ":" + "\"" + "uploadCancel" + "\"" + "," + "\"FileName\"" + ":" + "\"" + file_one.name + "\"" + "," + "\"Size\"" + ":" + "\"" + "" + "\"" + "," + "\"ChunkNum\"" + ":" + "\"" + "" + "\"" + "," + "\"MD5\"" + ":" + "\"" + "" + "\"" + "," + "\"ChunkPos\"" + ":" + "\"" + "" + "\"" + "}";
+function cancelUpload(index) {
+    let file_name = null;
+    if(upload_type === 1) {
+        file_name = fileObj[index].name;
+    }
+    else{
+        file_name = file_arr[index].name;
+    }
+
+    let upload_data = "{\"Option\"" + ":" + "\"" + "uploadCancel" + "\"" + "," + "\"FileName\"" + ":" + "\"" + file_name + "\"" + "," + "\"Size\"" + ":" + "\"" + "" + "\"" + "," + "\"ChunkNum\"" + ":" + "\"" + "" + "\"" + "," + "\"MD5\"" + ":" + "\"" + "" + "\"" + "," + "\"ChunkPos\"" + ":" + "\"" + "" + "\"" + "}";
     console.log(upload_data);
     $.ajax(
         {
@@ -1472,7 +1484,7 @@ function toTransport() {
                     // 如果当前为继续图标
                     else{
                         em_btn.className = "pause";
-                        reUpload(i);
+                        reUpload(i-1);
                     }
                 }
                 else{ // 如果当前为清除图标
@@ -1483,7 +1495,7 @@ function toTransport() {
             // 点击移除图标
             em_cancel.onclick = function () {
                 request.abort();
-                cancelUpload();
+                cancelUpload(i-1);
                 uploadList.removeChild(uploadList.children[i-1]);
                 total.style.width = 0;
                 isEmptyUpload();
