@@ -21,7 +21,7 @@
 /* 进度条 */
 .main .right .upload-progress{
     margin: 10px -17px 10px 0;
-    height: 570px;
+    height: 588px;
     overflow: auto;
 }
 .main .right .download-progress{
@@ -217,7 +217,7 @@
 .main .right .body .load-list{
     overflow: hidden;
     overflow-y: auto;
-    height: 349px;
+    height: 507px;
     margin-top: -1px;
 }
 .main .right .body .load-list ul{

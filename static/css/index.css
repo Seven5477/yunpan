@@ -121,11 +121,21 @@ body{
     background-repeat: no-repeat;
     margin-left: -35px;
 }
-.main .left .title .disk-iconfont2{
+.main .left .title .downloading_icon{
     width: 30px;
     height: 28px;
     display: inline-block;
-    background-image: url(../imgs/disk_recyle.png);
+    background-image: url(../imgs/downloading.png);
+    background-size: 90% 79%;
+    background-position: 4px 8px;
+    background-repeat: no-repeat;
+    margin-left: -35px;
+}
+.main .left .title .uploading_icon{
+    width: 30px;
+    height: 28px;
+    display: inline-block;
+    background-image: url(../imgs/uploading.png);
     background-size: 90% 79%;
     background-position: 4px 8px;
     background-repeat: no-repeat;

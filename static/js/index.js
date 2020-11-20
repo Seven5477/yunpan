@@ -327,6 +327,7 @@ function loadPage() {
 		for (let i = 0; i < nameLen; i++) {
 			filenameList[i].onclick = function (e) {
 				stopPropagation(e);
+				more_show.style.display = "none";
 				current_file = key_word[i]; //存储当前点击的文件夹
 				if(i_list[i].className != "dir_i") { //是文件不可进入
 					return;
@@ -345,6 +346,7 @@ function loadPage() {
         for (let i = 0; i < fileLen; i++) {
             fileList[i].ondblclick = function (e) {
 				stopPropagation(e);
+				more_show.style.display = "none";
                 this.index = i + 1;
                 clearBox();
                 // 清除上一次右键点击的样式
@@ -485,4 +487,7 @@ function loadPage() {
 	upload_btn.onmouseleave = function () {
 		upload_ul.style.display = 'none';
 	}
+
+	let el = document.getElementById('file');
+    el.addEventListener('change', upload, false);
 }

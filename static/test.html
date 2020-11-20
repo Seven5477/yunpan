@@ -1,31 +1,181 @@
 <!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
-</head>
-<style>
-    .iconfont-refresh{
-        width: 30px;
-        height: 30px;
-        display: inline-block;
-        background-image: url(./imgs/title_refresh.png);
-        background-size: 90% 90%;
-        background-position: 1px 4px;
-        background-repeat: no-repeat;
-    }
-</style>
-<script>
-    function refresh() {
-        window.getSelection ? window.getSelection().removeAllRanges() : document.selection.empty();
-    }
-</script>
-<body>
-    <li>
-        <i class="iconfont-refresh"></i>
-        <div onclick="refresh()" style="-moz-user-select:none;" onselectstart="return false">刷新刷新刷新刷新刷新</div>
-    </li>
-</body>
+<html>
+  <head>
+      <meta charset="utf-8">
+  </head> 
+  <body>
+         <!-- <form id="fileupload" action="" method="POST" enctype="multipart/form-data">
+            <div>
+                <div>                                                             
+                    添加文件
+                    <input type="file" name="" id="fileinput">                                                                     
+                </div>
 
+                <progress class='progressbar' value="0" max="100" style='width:500px;margin-top:20px'></progress>
+                <div style='margin-top:20px'>
+                    <span id="handler_info" ></span>
+                </div>
+            </div>   
+        </form> -->
+        
+<form>
+    <fieldset>
+        <legend>分度读取文件：</legend>
+        <input type="file" id="File" />
+        <input type="button" value="中断" id="Abort" />
+        <p>
+            <label>读取进度：</label><progress id="Progress" value="0" max="100"></progress>
+        </p>
+        <p id="Status"></p>
+    </fieldset>
+</form>
+    <script src="./js/md5.js" type="text/javascript"></script>
+    <script>
+        var h = {
+    init: function() {
+        var me = this;
+         
+        document.getElementById('File').onchange = me.fileHandler;
+        document.getElementById('Abort').onclick = me.abortHandler;
+         
+        me.status = document.getElementById('Status');
+        me.progress = document.getElementById('Progress');
+        me.percent = document.getElementById('Percent');
+         
+        me.loaded = 0;
+        //每次读取1M
+        me.step = 1024 * 1024;
+        me.times = 0;
+    },
+    fileHandler: function(e) {
+        var me = h;
+         
+        var file = me.file = this.files[0];
+         
+        var reader = me.reader = new FileReader();
+         
+        //
+        me.total = file.size;
+         
+        reader.onloadstart = me.onLoadStart;
+        reader.onprogress = me.onProgress;
+        reader.onabort = me.onAbort;
+        reader.onerror = me.onerror;
+        reader.onload = me.onLoad;
+        reader.onloadend = me.onLoadEnd;
+        //读取第一块
+        me.readBlob(file, 0);
+    },
+    onLoadStart: function() {
+        var me = h;
+    },
+    onProgress: function(e) {
+        var me = h;
+         
+        me.loaded += e.loaded;
+        //更新进度条
+        me.progress.value = (me.loaded / me.total) * 100;
+    },
+    onAbort: function() {
+        var me = h;
+    },
+    onError: function() {
+        var me = h;
+         
+    },
+    onLoad: function() {
+        var me = h;
+ 
+        if(me.loaded < me.total) {
+            me.readBlob(me.loaded);
+        } else {
+            me.loaded = me.total;
+        }
+    },
+    onLoadEnd: function() {
+        var me = h;
+         
+    },
+    readBlob: function(start) {
+        var me = h;
+         
+        var blob,
+            file = me.file;
+         
+        me.times += 1;
+         
+        if(file.webkitSlice) {
+            blob = file.webkitSlice(start, start + me.step + 1);
+        } else if(file.mozSlice) {
+            blob = file.mozSlice(start, start + me.step + 1);
+        }
+         
+        me.reader.readAsText(blob);
+    },
+    abortHandler: function() {
+        var me = h;
+         
+        if(me.reader) {
+            me.reader.abort();
+        }
+    }
+};
+ 
+h.init();
+        var tmp_md5;
+        function get_filemd5sum(ofile) {
+            var file = ofile;
+            console.log(file.size)
+            var blobSlice = File.prototype.slice || File.prototype.mozSlice || File.prototype.webkitSlice,
+                // file = this.files[0],
+                chunkSize = 8097152, // Read in chunks of 2MB
+                chunks = Math.ceil(file.size / chunkSize),
+                currentChunk = 0,
+                spark = new SparkMD5.ArrayBuffer(),
+                fileReader = new FileReader();
+
+            fileReader.onload = function(e) {
+                // console.log('read chunk nr', currentChunk + 1, 'of', chunks);
+                spark.append(e.target.result); // Append array buffer
+                currentChunk++;
+                var md5_progress = Math.floor((currentChunk / chunks) * 100);
+
+                console.log(file.name + "  正在处理，请稍等," + "已完成" + md5_progress + "%");
+                var handler_info = document.getElementById("handler_info");
+                var progressbar = document.getElementsByClassName("progressbar")[0];
+                handler_info.innerHTML=file.name + "  正在处理，请稍等," + "已完成" + md5_progress + "%"
+                progressbar.value =md5_progress;
+                if (currentChunk < chunks) {
+                    loadNext();
+                } else {
+                    tmp_md5 = spark.end();
+                    console.log(tmp_md5)
+                    handler_info.innerHTML = file.name + "的MD5值是：" + tmp_md5;
+                }
+            };
+
+            fileReader.onerror = function() {
+                console.warn('oops, something went wrong.');
+            };
+
+            function loadNext() {
+                var start = currentChunk * chunkSize,
+                    end = ((start + chunkSize) >= file.size) ? file.size : start + chunkSize;
+                fileReader.readAsArrayBuffer(blobSlice.call(file, start, end));
+            }
+            loadNext();
+        }
+
+        var uploadfile  = document.getElementById('fileinput')
+        uploadfile.onchange = function(e){
+            var file = this.files[0];
+             if(!file) {
+                alert('请选择文件！');
+                return false;
+            }
+            get_filemd5sum(file);
+            console.log(tmp_md5);
+        }
+    </script>
+   </body> 
 </html>

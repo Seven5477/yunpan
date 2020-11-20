@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <script src="./js/spark-md5.min.js"></script>
+</head>
+
+<body>
+    <input type="file" name="" id="file">
+    <div id="box"></div>
+</body>
+<script>
+    var m = null;
+    // document.querySelector('#file').addEventListener('change', e => {
+    //     let file = e.target.files[0];
+    //     console.log(e)
+    //     let fileReader = new FileReader()
+    //     fileReader.readAsBinaryString(file);
+    //     fileReader.onload = e => {
+    //     let md5 = SparkMD5.hashBinary(e.target.result);
+    //     console.log(md5);
+    // }
+    // });
+
+    let el = document.getElementById('file');
+    el.addEventListener('change', handle, false);
+
+    function handle(e) {
+        let file = e.target.files[0];
+        //   getLittleFileMd5(e, file);
+        // getBigFileMd5(e, file);
+        calculate(file);
+        // let n = getLittleFileMd5(e, file);
+        // computeMD5(file);
+    }
+
+    function calculate(file) {
+        var file = file;
+        var fileReader = new FileReader(),
+            box = document.getElementById('box');
+        blobSlice = File.prototype.mozSlice || File.prototype.webkitSlice || File.prototype.slice,
+            chunkSize = 2097152,
+            // read in chunks of 2MB
+            chunks = Math.ceil(file.size / chunkSize),
+            currentChunk = 0,
+            spark = new SparkMD5();
+
+        fileReader.onload = function (e) {
+            // console.log("read chunk nr", currentChunk + 1, "of", chunks);
+            spark.appendBinary(e.target.result);
+            currentChunk++;
+
+            if (currentChunk < chunks) {
+                loadNext();
+            }
+            else {
+                box.innerText = spark.end();
+                console.info("computed hash", box.innerText); // compute hash
+            }
+        };
+
+        function loadNext() {
+            var start = currentChunk * chunkSize,
+                end = start + chunkSize >= file.size ? file.size : start + chunkSize;
+
+            fileReader.readAsBinaryString(blobSlice.call(file, start, end));
+        };
+
+        loadNext();
+    }
+</script>
+
+</html>

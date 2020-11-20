@@ -13,11 +13,64 @@ function logout() {
 *      [boolean] true:是;false:否
 */
 function validateFileName(fileName) {
-    var reg = new RegExp('[\\\\/:*?\"<>|]');
+    let reg = new RegExp('[\\\\/:*?\"<>|]');
     if (reg.test(fileName)) {
         return false;
     }
     return true;
+}
+
+/* 计算文件的MD5值
+*  @params
+*      i 当前绑定的e的索引 obj 当前文件  
+*  @return 
+*/
+function getFileMd5(index) {
+    console.log("!!!!!=======-=================")
+    console.log(index)
+    let e = eObj[index];
+    let file = null;
+    if(upload_type === 1) {
+        file = fileObj[index];
+    }
+    else{
+        file = file_arr[index];
+    }
+    console.log(e)
+    console.log(file)
+    let fileReader = new FileReader(),
+        box = document.getElementById('file_md5');
+    blobSlice = File.prototype.mozSlice || File.prototype.webkitSlice || File.prototype.slice,
+        chunk_size = 2097152,
+        // read in chunks of 2MB
+        chunks = Math.ceil(file.size / chunk_size),
+        currentChunk = 0,
+        spark = new SparkMD5();
+
+    fileReader.onload = function (e) {
+        console.log("read chunk nr", currentChunk + 1, "of", chunks);
+        spark.appendBinary(e.target.result);
+        currentChunk++;
+
+        if (currentChunk < chunks) {
+            loadNext();
+        }
+        else {
+            box.innerText = spark.end();
+            console.info("MD5: ", box.innerText); // compute hash
+            md5_file = box.innerText;
+            uploadEver(index);
+        }
+    };
+
+    function loadNext() {
+        let start = currentChunk * chunk_size,
+            end = start + chunk_size >= file.size ? file.size : start + chunk_size;
+
+        fileReader.readAsBinaryString(blobSlice.call(file, start, end));
+    };
+
+    loadNext();
 }
 
 /* 阻止冒泡
@@ -401,6 +454,7 @@ function fileShow(ret) {
 		for (let i = 0; i < nameLen; i++) {
 			filenameList[i].onclick = function (e) {
                 stopPropagation(e);
+                more_show.style.display = "none";
 				current_file = key_word[i];
 				if(i_list[i].className != "dir_i") { //是文件不可进入
 					return;
@@ -419,6 +473,7 @@ function fileShow(ret) {
         for (let i = 0; i < fileLen; i++) {
             fileList[i].ondblclick = function (e) {
                 stopPropagation(e);
+                more_show.style.display = "none";
                 this.index = i + 1;
                 clearBox();
                 // 清除上一次右键点击的样式
@@ -602,7 +657,7 @@ function checkall() {
         more_show = document.getElementsByClassName("more")[0]; //更多按钮
     
     more_show.style.display = checkList[0].checked ? "block" : "none";
-    for (var i = 0; i < checkList.length; i++) {
+    for (let i = 0; i < checkList.length; i++) {
         checkList[i].checked = checkList[0].checked;
     }
 }
@@ -852,7 +907,7 @@ function newLoadli(name, size, dir) {
     div_name.innerText = name;
     div_size.innerText = size;
     div_path.innerText = dir;
-    div_sta.innerText = "正在上传";
+    div_sta.innerText = "等待上传";
 
     div_ope.appendChild(em1);
     div_ope.appendChild(em2);
@@ -864,6 +919,20 @@ function newLoadli(name, size, dir) {
     li.appendChild(div_pro);
     li.appendChild(div_info);
     uploadList.appendChild(li);
+}
+
+/* 添加文件对象到一个大对象中
+*  @params
+        target 要添加的某个对象
+        source 大对象
+*  @return
+        source 大对象
+*/
+function addFileObj(target, source) { 
+    let index = source.length;
+    source[index] = target;
+    source.length++;
+    return source;
 }
 
 /* 分片
@@ -920,11 +989,17 @@ function updateProgress(progress) {
         process.style.width = percent; //每个文件的进度
         status.innerText = percent; //每个文件的进度值
         total_percent[file_index] = process_global.toFixed(2);
-        let len = file_arr.length;
+        let len = null;
             total_proc = 0; //总进度
-        for(let i = 0; i < total_percent.length; i++) {
-            let sum = total_percent[i] / len;
-            total_proc += sum;
+        if(file_arr) { //上传文件夹
+            len = file_arr.length;
+            for(let i = 0; i < total_percent.length; i++) {
+                let sum = total_percent[i] / len;
+                total_proc += sum;
+            }
+        }
+        else{ //上传文件
+            total_proc = process_global;
         }
         console.log("total_percent:" + Math.round(total_proc));
         total.style.width = Math.round(total_proc) + "%"; //总进度
@@ -941,63 +1016,25 @@ function updateProgress(progress) {
 *  @params
 *  @return
 */
-function upload() {
+function upload(e) {
     upload_type = 1; //上传文件
-    fileObj = document.getElementById('file').files[0];
-    let file_name = fileObj.name,
-        file_size = bytesToSize(fileObj.size),
-        dir = localStorage.getItem("select_dir");
-    fileSize = fileObj.size;
-    console.log(fileObj);
-    console.log("file_name:" + file_name);
-    console.log("file_size:" + file_size);
-    console.log("dir:" + dir);
-    newLoadli(file_name, file_size, dir);
-    
-    chunkSize = chunk(fileSize);
-    chunkNum = Math.ceil(fileSize / chunkSize);
-    md5_file = b64_md5(fileObj);
-    let upload_data = "{\"Option\"" + ":" + "\"" + "uploadFile" + "\"" + "," + "\"FileName\"" + ":" + "\"" + file_name + "\"" + "," + "\"Size\"" + ":" + "\"" + fileSize + "\"" + "," + "\"ChunkNum\"" + ":" + "\"" + chunkNum + "\"" + "," + "\"MD5\"" + ":" + "\"" + md5_file + "\"" + "," + "\"ChunkPos\"" + ":" + "\"" + 1 + "\"" + "}";
-    console.log(upload_data);
-
-    let ret = confirm("是否将该文件上传至当前目录？");
-    if (ret) {
-        $.ajax(
-            {
-                url: uploadreq_rpc,
-                data: upload_data,
-                type: "POST",
-                async: false,
-                success: function (data)
-                {
-                    if(data.code == 1000){
-                        console.log(data.description);
-                        if(endupload_flag) {
-                            uploadFile(0);
-                        }
-                        return true;
-                    }
-                    else {
-                        alert(data.description);
-                        return false;
-                    }
-                },
-                error: function () {
-                    alert("Network error!")
-                }
-            });
-    }
-    else {
-        return;
-    }
+    file_one = document.getElementById('file').files[0];
+    let form_info = new FormData(document.getElementById('filename'));
+    formObj = addFileObj(form_info, formObj);
+    fileObj = addFileObj(file_one, fileObj);
+    eObj = addFileObj(e, eObj);
+    if(end_last) {
+        end_last = false;
+        getFileMd5(0);
+    }   
 }
 
 /* 续传文件
 *  @params
 *  @return
 */
-function reUpload() {
-    let file_name = fileObj.name;
+function reUpload(index) {
+    let file_name = fileObj[index].name;
 
     let upload_data = "{\"Option\"" + ":" + "\"" + "reUploadFile" + "\"" + "," + "\"FileName\"" + ":" + "\"" + file_name + "\"" + "," + "\"Size\"" + ":" + "\"" + fileSize + "\"" + "," + "\"ChunkNum\"" + ":" + "\"" + chunkNum + "\"" + "," + "\"MD5\"" + ":" + "\"" + md5_file + "\"" + "," + "\"ChunkPos\"" + ":" + "\"" + chunkNum_uploaded + "\"" + "}";
     console.log(upload_data);
@@ -1030,7 +1067,7 @@ function reUpload() {
 *  @return
 */
 function cancelUpload() {
-    let upload_data = "{\"Option\"" + ":" + "\"" + "uploadCancel" + "\"" + "," + "\"FileName\"" + ":" + "\"" + fileObj.name + "\"" + "," + "\"Size\"" + ":" + "\"" + "" + "\"" + "," + "\"ChunkNum\"" + ":" + "\"" + "" + "\"" + "," + "\"MD5\"" + ":" + "\"" + "" + "\"" + "," + "\"ChunkPos\"" + ":" + "\"" + "" + "\"" + "}";
+    let upload_data = "{\"Option\"" + ":" + "\"" + "uploadCancel" + "\"" + "," + "\"FileName\"" + ":" + "\"" + file_one.name + "\"" + "," + "\"Size\"" + ":" + "\"" + "" + "\"" + "," + "\"ChunkNum\"" + ":" + "\"" + "" + "\"" + "," + "\"MD5\"" + ":" + "\"" + "" + "\"" + "," + "\"ChunkPos\"" + ":" + "\"" + "" + "\"" + "}";
     console.log(upload_data);
     $.ajax(
         {
@@ -1066,11 +1103,21 @@ function uploadFile(start) {
     // 上传完成 
     if (start >= fileSize) {
         console.log("上传完成......");
+        end_last = true;
         endupload_flag = true;
         process_global = 0;
         chunkNum_uploaded = 1;
         if(upload_type === 1) {
-            fileShow(current_file);
+            obj_index++;
+            if(obj_index >= fileObj.length) {
+                fileObj =  {
+                    length: 0
+                };
+                fileShow(current_file);
+            }
+            else{
+                getFileMd5(obj_index);
+            }
         }
         else{
             file_index++;
@@ -1078,7 +1125,7 @@ function uploadFile(start) {
                 fileShow(current_file);
             }
             else{
-                uploadEver(file_index);
+                getFileMd5(file_index);
             }
         }
         return;
@@ -1087,12 +1134,12 @@ function uploadFile(start) {
     end = (start + chunkSize > fileSize) ? fileSize : (start + chunkSize);
 
     // 将文件切块上传
-    let form_data = new FormData(document.getElementById('filename')); //获取表单信息
+    let form_data = formObj[obj_index]; //获取表单信息
     let formData = new FormData();
-    if(!form_data.get('uploadfile').name) {
+    if(upload_type === 2) { //上传文件夹
         formData.append("uploadfile", file_obj.slice(start, end)) //将获取的文件分片赋给新的对象
     }
-    else{
+    else{ //上传文件
         formData.append("uploadfile", form_data.get("uploadfile").slice(start, end)) //将获取的文件分片赋给新的对象
     }
 
@@ -1108,7 +1155,7 @@ function uploadFile(start) {
             let xhr = $.ajaxSettings.xhr();
             if (xhr.upload) {
                 xhr.upload.onprogress = function (progress) {
-                    self.updateProgress(progress);
+                    updateProgress(progress);
                 };
             }
             return xhr;
@@ -1136,10 +1183,11 @@ function uploadFile(start) {
 function uploadDir() {
     upload_type = 2; //上传文件夹
     $('#folder').change(function(e){
+        eObj = addFileObj(e, eObj);
         let folder_name = null; //文件夹名
         let files = e.target.files; //所有文件
         file_arr = files;
-        folder_name = (files[0].webkitRelativePath).split('/')[0];
+        folder_name = (files[0].webkitRelativePath).split('/')[0]; //获取文件夹名
         
         //新建上传的同名文件夹
         let new_data = "{\"Opt\"" + ":" + "1" + "," + "\"DirName\"" + ":" + "[\"" + folder_name + "\"]" + "}";
@@ -1166,7 +1214,7 @@ function uploadDir() {
                 alert("Network error!")
             }
         });
-        uploadEver(0);
+        getFileMd5(0);
     });
 }
 
@@ -1176,7 +1224,17 @@ function uploadDir() {
 *  @return
 */
 function uploadEver(index) {
-    file_obj = file_arr[index];
+    if(upload_type === 1) {
+        file_obj = fileObj[index];
+        // let uploadList = document.getElementById("uploadList");
+        // if(uploadList.children[index+1]) {
+        //     uploadList.removeChild(uploadList.children[index+1]);
+        // }
+    }
+    else{
+        file_obj = file_arr[index];
+    }
+    console.log(file_obj)
     let file_name = file_obj.name,
         file_size = bytesToSize(file_obj.size),
         dir = localStorage.getItem("select_dir");
@@ -1189,7 +1247,6 @@ function uploadEver(index) {
 
     chunkSize = chunk(fileSize);
     chunkNum = Math.ceil(fileSize / chunkSize);
-    md5_file = b64_md5(file_obj);
     let upload_data = "{\"Option\"" + ":" + "\"" + "uploadFile" + "\"" + "," + "\"FileName\"" + ":" + "\"" + file_name + "\"" + "," + "\"Size\"" + ":" + "\"" + fileSize + "\"" + "," + "\"ChunkNum\"" + ":" + "\"" + chunkNum + "\"" + "," + "\"MD5\"" + ":" + "\"" + md5_file + "\"" + "," + "\"ChunkPos\"" + ":" + "\"" + 1 + "\"" + "}";
     console.log(upload_data);
     $.ajax(
@@ -1415,7 +1472,7 @@ function toTransport() {
                     // 如果当前为继续图标
                     else{
                         em_btn.className = "pause";
-                        reUpload();
+                        reUpload(i);
                     }
                 }
                 else{ // 如果当前为清除图标
