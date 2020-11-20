@@ -33,16 +33,19 @@ var current_file = ".";  //当前所在的文件夹
 
     /*上传文件需要的变量*/
     file_one = null, //上传文件的文件对象
-    request = null, //上传请求，用于暂停
+    request = null;
+    // requestObj = {
+    //     length: 0
+    // }, //上传请求，用于暂停
     eObj =  {
         length: 0
-    }; //存储绑定的e对象
+    }, //存储绑定的e对象
     formObj =  {
         length: 0
-    }; //存储每次点击上传文件里的文件的formdata信息
+    }, //存储每次点击上传文件里的文件的formdata信息
     fileObj =  {
         length: 0
-    }; //存储每次点击上传文件里的文件
+    }, //存储每次点击上传文件里的文件
     obj_index = 0; //fileObj的索引属性
     end_last = true; //上一个文件上传结束的标识
     end_lastLi = true;

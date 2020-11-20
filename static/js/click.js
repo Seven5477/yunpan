@@ -1074,13 +1074,28 @@ function upload(e) {
     }   
 }
 
+/* 暂停文件
+*  @params
+        index 任务列表索引
+*  @return
+*/
+function pauseUpload(index) {
+    
+}
+
 /* 续传文件
 *  @params
         index 任务列表索引
 *  @return
 */
 function reUpload(index) {
-    let file_name = fileObj[index].name;
+    let file_name = null;
+    if(upload_type === 1) {
+        file_name = fileObj[index].name;
+    }
+    else{
+        file_name = file_arr[index].name;
+    }
 
     let upload_data = "{\"Option\"" + ":" + "\"" + "reUploadFile" + "\"" + "," + "\"FileName\"" + ":" + "\"" + file_name + "\"" + "," + "\"Size\"" + ":" + "\"" + fileSize + "\"" + "," + "\"ChunkNum\"" + ":" + "\"" + chunkNum + "\"" + "," + "\"MD5\"" + ":" + "\"" + md5_file + "\"" + "," + "\"ChunkPos\"" + ":" + "\"" + chunkNum_uploaded + "\"" + "}";
     console.log(upload_data);
@@ -1513,7 +1528,6 @@ function toTransport() {
                     if(em_btn.className == "pause") {
                         em_btn.className = "continue";
                         request.abort();
-                        fileShow(current_file);
                     }
                     // 如果当前为继续图标
                     else{
@@ -1533,7 +1547,6 @@ function toTransport() {
                 uploadList.removeChild(uploadList.children[i-1]);
                 total.style.width = 0;
                 isEmptyUpload();
-                fileShow(current_file);
             }
         }
     })();
@@ -1564,8 +1577,23 @@ function toDisk() {
 *  @return
 */
 function pauseList() {
-    let pause = document.getElementsByClassName("total-pause")[0];
-    pause.innerText = pause.innerText == "全部暂停" ? "全部开始" : "全部暂停";
+    let pause = document.getElementsByClassName("total-pause")[0],
+        uploadList = document.getElementById("uploadList"),
+        liList = uploadList.getElementsByTagName("li"),
+        len = liList.length;
+    // pause.innerText = pause.innerText == "全部暂停" ? "全部开始" : "全部暂停";
+    if(pause.innerText === "全部暂停") {
+        for(let i = 0; i < len; i++){
+            // pauseUpload(i);
+        }
+        pause.innerText = "全部开始";
+    }
+    else{
+        for(let i = 0; i < len; i++){
+            reUpload(i);
+        }
+        pause.innerText = "全部暂停";
+    }
 }
 
 /* 全部取消下载
