@@ -34,9 +34,11 @@ var current_file = ".";  //当前所在的文件夹
     /*上传文件需要的变量*/
     file_one = null, //上传文件的文件对象
     request = null;
-    // requestObj = {
-    //     length: 0
-    // }, //上传请求，用于暂停
+    requestObj = {
+        length: 0
+    }, //上传请求，用于暂停
+    RequestArray = [],
+    argItem = [],
     eObj =  {
         length: 0
     }, //存储绑定的e对象
@@ -64,3 +66,7 @@ var current_file = ".";  //当前所在的文件夹
 
 var chunkSize = 0, //每片的大小
     fileSize = 0;  //文件大小
+
+var 
+    result = null,
+    xmlHttp = null;

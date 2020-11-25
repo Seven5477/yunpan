@@ -1068,6 +1068,8 @@ function upload(e) {
     formObj = addFileObj(form_info, formObj);
     fileObj = addFileObj(file_one, fileObj);
     eObj = addFileObj(e, eObj);
+    requestObj = addFileObj(RequestArray, requestObj);
+    // requestObj = addFileObj(request_arr, requestObj);
     if(end_lastLi) {
         end_lastLi = false;
         addLi(indexLi);
@@ -1080,7 +1082,16 @@ function upload(e) {
 *  @return
 */
 function pauseUpload(index) {
-    
+    console.log(requestObj);
+    console.log(requestObj[index]);
+    console.log(requestObj[index][0]);
+    console.log(requestObj[index][0][2]);
+    requestObj[index][0][2].abort(); //中止当前上传任务中的已上传的最后一片
+    if(index < requestObj.length - 1) {
+        index++;
+        chunkNum_uploaded = 1;
+        getFileMd5(index);
+    }
 }
 
 /* 续传文件
@@ -1213,7 +1224,7 @@ function uploadFile(start) {
         formData.append("uploadfile", form_data.get("uploadfile").slice(start, end)) //将获取的文件分片赋给新的对象
     }
 
-    request = $.ajax({
+    $.ajax({
         url: upload_rpc,
         data: formData,
         type: "POST",
@@ -1228,6 +1239,7 @@ function uploadFile(start) {
                     updateProgress(progress);
                 };
             }
+            argItem[2] = xhr; //将每个上传任务的每一片存入requestObj对象中，该对象存入的是request_arr数组中
             return xhr;
         },
         success: function(data) 
@@ -1320,6 +1332,10 @@ function uploadEver(index) {
             {
                 if(data.code == 1000){
                     console.log(data.description);
+                    argItem[0] = file_name;
+                    argItem[1] = md5_file;
+                    RequestArray.push(argItem);
+                    console.log(argItem);
                     uploadFile(0);
                     return true;
                 }
@@ -1527,7 +1543,7 @@ function toTransport() {
                     // 如果当前为暂停图标
                     if(em_btn.className == "pause") {
                         em_btn.className = "continue";
-                        request.abort();
+                        pauseUpload(i-1);
                     }
                     // 如果当前为继续图标
                     else{
@@ -1542,7 +1558,7 @@ function toTransport() {
             }
             // 点击移除图标
             em_cancel.onclick = function () {
-                request.abort();
+                pauseUpload(i-1);
                 cancelUpload(i-1);
                 uploadList.removeChild(uploadList.children[i-1]);
                 total.style.width = 0;
@@ -1581,10 +1597,9 @@ function pauseList() {
         uploadList = document.getElementById("uploadList"),
         liList = uploadList.getElementsByTagName("li"),
         len = liList.length;
-    // pause.innerText = pause.innerText == "全部暂停" ? "全部开始" : "全部暂停";
     if(pause.innerText === "全部暂停") {
         for(let i = 0; i < len; i++){
-            // pauseUpload(i);
+            pauseUpload(i);
         }
         pause.innerText = "全部开始";
     }
@@ -1601,5 +1616,11 @@ function pauseList() {
 *  @return
 */
 function cancelList() {
-
+    let uploadList = document.getElementById("uploadList"),
+        liList = uploadList.getElementsByTagName("li"),
+        len = liList.length;
+    for(let i = 0; i < len; i++){
+        pauseUpload(i);
+        cancelUpload(i);
+    }
 }
