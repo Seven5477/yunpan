@@ -46,18 +46,23 @@
         </div>
     </body>
     <script>
-        document.getElementsByClassName("regist")[0].getElementsByTagName("a")[0].href = regist_href;
+        $(".regist a")[0].href = regist_href; //注册页面
+
+        // 按enter键自动登录
         function keyLogin(){
             if (event.keyCode == 13){  //回车键的键值为13
                 var btn = document.getElementsByTagName("button")[0];
                 btn.click();  //xxxx为登录按钮的id
             }
         }
+
+        // 登录
         function login() {
-            let username = document.getElementsByName("username")[0].value,
-                password = document.getElementsByName("password")[0].value;
-            let login_data = "{\"username\""+ ":\"" + username + "\"," + "\"password\"" + ":\"" + b64_md5(password) + "\"}";
-            console.log(username + " " + password);
+            let username = $(".name input")[0].value,
+                password = $(".pwd input")[0].value;
+            let login_data = `{"username":"${username}","password":"${b64_md5(password)}"}`;
+            
+            // 验证登录名和密码
             $.ajax(
                 {
                     url: login_rpc,
@@ -66,10 +71,9 @@
                     async: false,
                     success: function(data)
                     {
-                        if(data.code == 1000){
-                            console.log(data.description);
+                        if(data.code === "1000"){
                             window.location.href = index_href;
-                            window.localStorage.setItem('user',username);
+                            window.localStorage.setItem('user',username); //存储用户名
                             return true;
                         }
                         else{
