@@ -1,115 +1,51 @@
-/* 登录成功后进入用户主界面
-*  @params
-*  @return
-*/
+function loadPage() {
+    queryData(current_file);
+}
 
-let netdiskModule = (function ($) {
-	// 显示用户名
-	let user = $(".username");
-	user.html(username);  //显示用户名
+// 获取数据
+function queryData(ret) {
+    let index_data = `{"Opt":0,"DirName":["${ret}"]}`;
+    console.log(index_data);
+    $.ajax({
+        url: home_rpc,
+        data: index_data,
+        type: "POST",
+        async: false,
+        success: function (data) {
+            if (data) {
+                _DATA = data;
+                return true;
+            }
+            else {
+                return false;
+            }
+        },
+        error: function () {
+            alert("Network error!")
+        }
+    });
+    bindHTML();
+    clickHandle();
+}
 
-	let container = $(".content")[0],  //文件目录表格所在的区域
-		menu = $(".menu")[0],  //右键的菜单
-		file_system = $(".file_system")[0],  //当前所在文件路径
-		table = $("table"); //表格
-	table.css("borderCollapse", "collapse");
+// 把数据绑定在页面中
+function bindHTML() {
+	console.log("bind")
+	if (!_DATA) return;
+	let htmlStr = ``;
+	dirs_files_data = [];
+	index = 0,
+	tbody = $("<tbody></tbody>");  //创建tbody用于存储目录结构
+	table.append(tbody);
 
-	let index_data = `{"Opt":0,"DirName":["."]}`;
+	console.log(tbody);
 
-	let _DATA,  //目录数据(JSON格式)
-		dirs_files_data = [],  //存储所有文件夹，便于点击查看时获取当前点击的文件夹
-		index = 0;  //key_word的索引
-
-	// 从服务器获取目录数据
-	function queryData() {
-		$.ajax({
-			url: home_rpc,
-			data: index_data,
-			type: "POST",
-			async: false,
-			success: function (data) {
-				if (data) {
-					_DATA = data;
-					return true;
-				}
-				else {
-					return false;
-				}
-			},
-			error: function () {
-				alert("Network error!")
-			}
-		});
-	}
-
-	function isFileType(flieName) {
-		let className = null,
-			arr = flieName.split('.'), //文件名用点分隔为数组
-			file_type = arr[arr.length - 1]; //获取文件名后缀
-		switch (file_type) {
-			case "jpeg":
-				className = "jpeg_i";
-				break;
-			case "jpg":
-				className = "jpg_i";
-				break;
-			case "mp3":
-				className = "mp3_i";
-				break;
-			case "mp4":
-				className = "mp4_i";
-				break;
-			case "pdf":
-				className = "pdf_i";
-				break;
-			case "png":
-				className = "png_i";
-				break;
-			case "ppt":
-				className = "ppt_i";
-				break;
-			case "rar":
-				className = "rar_i";
-				break;
-			case "zip":
-				className = "rar_i";
-				break;
-			case "txt":
-				className = "txt_i";
-				break;
-			case "doc":
-				className = "word_i";
-				break;
-			case "docx":
-				className = "word_i";
-				break;
-			case "xls":
-				className = "xls_i";
-				break;
-			case "xlsx":
-				className = "xls_i";
-				break;
-			default:
-				className = "other_i";
-				break;
-		}
-		return className;
-	}
-
-	// 把数据绑定在页面中
-	function bindHTML() {
-		if (!_DATA) return;
-		let htmlStr = ``;
-
-		//创建tbody用于存储目录结构
-		let tbody = $("<tbody></tbody>");
-		table.append(tbody);
-
-		// 遍历数据(json格式)
-		for (let key in _DATA) {
-			if (key !== "CurrentDir") {
-				// 遍历属性值(数组形式)	
-				if (key === "Dirs") {
+	// 遍历数据(json格式)
+	for (let key in _DATA) {
+		if (key !== "CurrentDir") {
+			// 遍历属性值(数组形式)	
+			if (key === "Dirs") {
+				if (_DATA[key]) {
 					_DATA[key].forEach(item => {
 						let { DirName, Size, ModTime } = item;
 						dirs_files_data[index] = DirName;
@@ -140,570 +76,280 @@ let netdiskModule = (function ($) {
 							</tr>
 						`;
 					});
-					tbody.append(htmlStr);
-					htmlStr = ``;
 				}
-				else if (key === "Files") {
+			}
+			else if (key === "Files") {
+				if (_DATA[key]) {
 					_DATA[key].forEach(item => {
 						let { FileName, Size, ModTime } = item;
 						dirs_files_data[index] = FileName;
 						index++;
 						htmlStr += `
-							<tr class="trstyle">
-								<td class="tdwidthbox">
-									<label class="checklabel">
-										<input type="checkbox" class="checkbox">
-										<i class="check"></i>
-									</label>
-								</td>
-								<td class="tdwidth1">
-									<div class="file_name">
-										<span>${FileName}</span>
-									</div>
-									<label class="dir_label">
-										<i class="${isFileType(FileName)}"></i>
-									</label>
-									<div class="div_icon" style="display: none;">
-										<i class="icon_share"></i>
-										<i class="icon_download"></i>
-										<i class="icon_more"></i>
-									</div>
-								</td>
-								<td class="tdwidth2">${Size}</td>
-								<td class="tdwidth3">${ModTime}</td>
-							</tr>
-						`;
+								<tr class="trstyle">
+									<td class="tdwidthbox">
+										<label class="checklabel">
+											<input type="checkbox" class="checkbox">
+											<i class="check"></i>
+										</label>
+									</td>
+									<td class="tdwidth1">
+										<div class="file_name">
+											<span>${FileName}</span>
+										</div>
+										<label class="dir_label">
+											<i class="${isFileType(FileName)}"></i>
+										</label>
+										<div class="div_icon" style="display: none;">
+											<i class="icon_share"></i>
+											<i class="icon_download"></i>
+											<i class="icon_more"></i>
+										</div>
+									</td>
+									<td class="tdwidth2">${Size}</td>
+									<td class="tdwidth3">${ModTime}</td>
+								</tr>
+							`;
 					});
-					tbody.append(htmlStr);
-					htmlStr = ``;
-				}
-			}
-			else {
-				current_dir = _DATA[key].slice(0, -1).split('/'); //以数组的形式存储路径
-				for (let i = current_dir.length - 1; i >= 2; i--) {
-					let a = document.createElement("a"),
-						span = document.createElement("span");
-					if (current_dir[i] === username) {
-						a.innerText = "全部文件";
-					}
-					else {
-						a.innerText = current_dir[i];
-					}
-					a.className = "file_system_a";
-					span.innerText = '>';
-					span.className = "file_system_span";
-					file_system.insertBefore(a, file_system.children[0]);
-					if (i !== (current_dir.length - 1)) {
-						file_system.insertBefore(span, file_system.children[1]);
-					}
 				}
 			}
 		}
-	}
-
-
-
-return {
-	init() {
-		queryData();
-		bindHTML();
-	}
-}
-}) (jQuery);
-
-netdiskModule.init();
-
-/* 登录成功后进入用户主界面
-*  @params
-*  @return
-*/
-function loadPage() {
-	// 显示用户名
-	let user = document.getElementsByClassName("username")[0];
-		user.innerHTML = username;  //用户名
-
-	let container = document.getElementsByClassName("content")[0],  //文件目录表格所在的区域
-		menu = document.getElementsByClassName("menu")[0],  //右键的菜单
-		file_system = document.getElementsByClassName("file_system")[0];  //当前路径
-	let index_data = "{\"Opt\"" + ":" + "0" + "," + "\"DirName\"" + ":" + "[\"" + current_file + "\"]" + "}";
-	console.log(index_data)
-	let json_str,  //目录数据（字符串）
-		message,   //转化为json格式
-		key_word = [],  //存储所有文件夹，便于点击查看时获取当前点击的文件夹
-		index = 0;  //key_word的索引
-
-	// 显示当前目录
-	$.ajax(
-		{
-			url: home_rpc,
-			data: index_data,
-			type: "POST",
-			async: false,
-			success: function (data)
-			{
-				if(data){
-					json_str = data;
-					return true;
+		else {
+			current_dir = _DATA[key].slice(0, -1).split('/'); //以数组的形式存储路径
+			let str = ``,
+				text = "";
+			for (let i = 2; i < current_dir.length; i++) {
+				if (current_dir[i] === username) {
+					text = "全部文件";
 				}
 				else {
-					return false;
+					text = current_dir[i];
 				}
-			},
-			error: function () {
-				alert("Network error!")
-			}
-		});
-
-	//创建tbody用于存储目录结构
-	let json_table = document.getElementsByTagName("table")[0];
-	json_table.style.borderCollapse = "collapse";
-	let json_tbody = document.createElement("tbody"),
-		json_tr = document.createElement("tr");
-	json_table.appendChild(json_tbody);
-
-	message = json_str; //转换为json格式
-	console.log(message);
-	// 遍历对象的属性
-	for (let prop in message) {
-		if(prop !== "CurrentDir") {
-			// 遍历对象的某个属性		
-			for (let num in message[prop]) {
-				let json_tr = document.createElement("tr");
-				// 每行第一列为checkbox
-				let checkbox_td = document.createElement("td"),
-					label = document.createElement("label"),
-					input = document.createElement("input"),
-					i = document.createElement("i");
-
-				checkbox_td.className = "tdwidthbox";
-				label.className = "checklabel";
-				input.className = "checkbox";
-				input.type = "checkbox";
-				i.className = "check";
-				
-				label.appendChild(input);
-				label.appendChild(i);
-				checkbox_td.appendChild(label);
-				json_tr.appendChild(checkbox_td);
-
-				// 遍历对象的某个属性
-				for (let key in message[prop][num]) {
-					let json_td = document.createElement("td");
-					//获取键key
-					let td_txt = document.createTextNode(message[prop][num][key]);
-					// 大小和修改时间直接放入td
-					if (key != "FileName" && key != "DirName") {
-						json_td.appendChild(td_txt);
-					}
-					// 文件名的td添加样式
-					else {
-						let json_span = document.createElement("span");
-						let json_div = document.createElement("div");
-						json_div.className = "file_name";
-
-						json_span.appendChild(td_txt);
-						json_div.appendChild(json_span);
-						json_td.appendChild(json_div);
-					}
-					json_tr.appendChild(json_td);
-					json_tbody.appendChild(json_tr);
-					json_tr.className = "trstyle";
-
-					if (key == "DirName" || key == "FileName") {
-						// 存储文件夹和文件的值放入key_word
-						key_word[index] = message[prop][num][key];
-						index++;
-						json_td.className = "tdwidth1";
-
-						// 添加文件的图标
-						let label_file = document.createElement("label"),
-							i_file = document.createElement("i");
-							label_file.className = "dir_label";
-						label_file.appendChild(i_file);
-						json_td.appendChild(label_file);
-
-						// 添加操作图标
-						let div_icon = document.createElement("div"),
-							icon_share = document.createElement("i"),
-							icon_download = document.createElement("i"),
-							icon_more = document.createElement("i");
-						div_icon.className = "div_icon";
-						icon_share.className = "icon_share";
-						icon_download.className = "icon_download";
-						icon_more.className = "icon_more";
-						div_icon.appendChild(icon_share);
-						div_icon.appendChild(icon_download);
-						div_icon.appendChild(icon_more);
-						json_td.appendChild(div_icon);
-
-						if(key == "DirName") {  //文件夹的图标
-							i_file.className = "dir_i";
-						}
-						else{  //文件的图标
-							i_file.className = "file_i";
-							let arr = message[prop][num][key].split('.');
-							let file_type = arr[arr.length-1]; //文件类型
-							switch(file_type) {
-								case "jpeg":
-									i_file.className = "jpeg_i";
-									break;
-								case "jpg":
-									i_file.className = "jpg_i";
-									break;
-								case "mp3":
-									i_file.className = "mp3_i";
-									break;
-								case "mp4":
-									i_file.className = "mp4_i";
-									break;
-								case "pdf":
-									i_file.className = "pdf_i";
-									break;
-								case "png":
-									i_file.className = "png_i";
-									break;
-								case "ppt":
-									i_file.className = "ppt_i";
-									break;
-								case "rar":
-									i_file.className = "rar_i";
-									break;
-								case "zip":
-									i_file.className = "rar_i";
-									break;
-								case "txt":
-									i_file.className = "txt_i";
-									break;
-								case "doc":
-									i_file.className = "word_i";
-									break;
-								case "docx":
-										i_file.className = "word_i";
-										break;
-								case "xls":
-									i_file.className = "xls_i";
-									break;
-								case "xlsx":
-										i_file.className = "xls_i";
-										break;
-								default:
-									i_file.className = "other_i";
-									break;
-							}
-						}
-					}
-					else if (key == "Size") {
-						json_td.className = "tdwidth2";
-					}
-					else if (key == "ModTime") {
-						json_td.className = "tdwidth3";
-					}
-				}
-			}
-		}
-		else{
-			current_dir = message[prop].slice(0, -1).split('/'); //以数组的形式存储路径
-			for(let i = current_dir.length - 1; i >= 2 ; i--) {
-				let a = document.createElement("a"),
-					span = document.createElement("span");
-				if(current_dir[i] === username) {
-					a.innerText = "全部文件";
-				}
-				else{
-					a.innerText = current_dir[i];
-				}
-				a.className = "file_system_a";
-				span.innerText = '>';
-				span.className = "file_system_span";
-				file_system.insertBefore(a, file_system.children[0]);
-				if(i !== (current_dir.length - 1)) {
-					file_system.insertBefore(span, file_system.children[1]);
-				}
+				str += `
+						<a class="file_system_a">${text}</a>
+						${(i === current_dir.length - 1) ? "" : "<span class='file_system_span'>></span>"}
+					`;
+				file_system.html(str);
 			}
 		}
 	}
+	tbody.html(htmlStr);
+}
 
-	// 左键点击表格某一行
-	let trList = document.getElementsByTagName("tr"), //每一行文件
-		checkList = document.getElementsByClassName("checkbox"),  //文件左侧的选择框
-		fileList = document.getElementsByClassName("file_name"), //文件名集合
-		more_show = document.getElementsByClassName("more")[0], //更多按钮
-		trLen = trList.length,
-		checkLen = checkList.length,
-		fileLen = fileList.length,
+// 处理点击
+function clickHandle() {
+	let trList = $("tr"), //每一行文件
+		checkList = $(".checkbox"),  //文件左侧的选择框
+		fileList = $(".file_name"), //文件名集合
+		iconList = $(".div_icon"),
+		more_show = $(".more"), //更多按钮
+		labelList = $(".checklabel"),
+		tdList = $(".tdwidth1"),
+		systemList = $(".file_system_a"),
 		lastIndex_leftBtn = 0,  //左键的上一次点击
-		lastIndex_rightBtn = 0;  //右键的上一次点击
-	(function () {
-        for (let i = 0; i < fileLen; i++) {
-            fileList[i].onclick = function (e) {
-				stopPropagation(e); //阻止冒泡
-				this.index = i + 1; //去掉第一行
-				// 清除所有选中框的样式
-				clearBox();
-				more_show.style.display = "block"; //显示更多按钮
-				// 清除上一次右键点击的样式
-				trList[lastIndex_rightBtn].style.background = "none";
-				checkList[lastIndex_rightBtn].checked = false;
-                if (!(trList[this.index])) {
-                    return;
-                }
-                else {
-                    trList[lastIndex_leftBtn].style.background = "none";
-                    checkList[lastIndex_leftBtn].checked = false;
-                    // 添加背景颜色
-                    trList[this.index].style.background = "#e8f6fd";
-                    // 选中方框
-                    checkList[this.index].checked = true;
-                    trList[this.index].isClick = true;
-                    lastIndex_leftBtn = this.index; //保存当前的index
-				}
-            }
-        }
-	})();
+		lastIndex_rightBtn = 0;  //右键的上一次点
 
-	// 鼠标划过第一行不变换背景色
-	trList[0].onmousemove = function () {
-		trList[0].style.background = "none";
-	};
+	// 鼠标经过上传按钮
+	let upload_btn = $(".upload"),
+		upload_ul = $(".upload_file"),
+		el = $('#file')[0];
 
-	// 鼠标停留/离开时显示/隐藏每行的操作图标
-	let iconList = document.getElementsByClassName("div_icon");
-	(function () {
-        for (let i = 1; i < trList.length; i++) {
-            trList[i].onmouseenter = function (e) {
-				stopPropagation(e); //阻止冒泡
-				iconList[i-1].style.display = "block";
-			}
-			trList[i].onmouseleave = function (e) {
-				stopPropagation(e); //阻止冒泡
-				iconList[i-1].style.display = "none";
-            }
-        }
-	})();
+	el.addEventListener('change', upload, false);
 
-	
-	// 点击选择框
-	let labelList = document.getElementsByClassName("checklabel"),
-		labelLen = labelList.length;
-	(function() {
-		for(let i = 1; i < labelLen; i++) {
-			labelList[i].onclick = function (e) {
-				stopPropagation(e);
-				menu.style.display = 'none';
-				if(checkList[i].checked) {
-					checkList[i].checked = false;
-					trList[i].style.background = "none";
-					clearMore();
-				}
-				else{				
-					checkList[i].checked = true;
-					trList[i].style.background = "#e8f6fd";
-					clearMore();
-				}
-			}
-		}
-	})();
-
-	// 点击图标
-	let dirlist = document.getElementsByClassName("dir_label"),
-		dirLen = dirlist.length;
-	(function() {
-		for(let j = 0; j < dirLen; j++) {
-			dirlist[j].onclick = function (e) {
-				let i = j + 1;
-				stopPropagation(e);
-				menu.style.display = 'none';
-				if(checkList[i].checked) {
-					checkList[i].checked = false;
-					trList[i].style.background = "none";
-					clearMore();
-				}
-				else{				
-					checkList[i].checked = true;
-					trList[i].style.background = "#e8f6fd";
-					clearMore();
-				}
-			}
-		}
-	})();
-
-	//左键点击查看文件
-	let	filenameList = [];  //文件名集合
-	let tdList = document.getElementsByClassName("tdwidth1"),
-		td1Len = tdList.length;
-		i_list = [];
-	for (let i = 0; i < fileLen; i++) {
-		filenameList[i] = fileList[i].getElementsByTagName("span")[0];
-	}
-	for (let i = 1; i < td1Len; i++) {
-		i_list.push(tdList[i].getElementsByTagName("i")[0])
-	}
-	let nameLen = filenameList.length;
-	(function () {
-		for (let i = 0; i < nameLen; i++) {
-			filenameList[i].onclick = function (e) {
-				stopPropagation(e);
-				more_show.style.display = "none";
-				current_file = key_word[i]; //存储当前点击的文件夹
-				if(i_list[i].className != "dir_i") { //是文件不可进入
-					return;
-				}
-				else{ //文件夹可以进入
-					select_dir = (fileList[i].getElementsByTagName("span")[0]).innerText;  //存储当前点击的文件夹
-					window.localStorage.setItem('select_dir',select_dir);
-					fileShow(current_file);
-				}
-			}
-		}
-	})();
-
-	// 鼠标双击
-    (function () {
-        for (let i = 0; i < fileLen; i++) {
-            fileList[i].ondblclick = function (e) {
-				stopPropagation(e);
-				more_show.style.display = "none";
-                this.index = i + 1;
-                clearBox();
-                // 清除上一次右键点击的样式
-                trList[lastIndex_rightBtn].style.background = "none";
-                checkList[lastIndex_rightBtn].checked = false;
-                if (!(trList[this.index])) {
-                    return;
-                }
-                else {
-                    trList[lastIndex_leftBtn].style.background = "none";
-                    checkList[lastIndex_leftBtn].checked = false;
-                    // 添加背景颜色
-                    trList[this.index].style.background = "#e8f6fd";
-                    // 选中方框
-                    checkList[this.index].checked = true;
-                    trList[this.index].isClick = true;
-                    lastIndex_leftBtn = this.index; //保存当前的index
-                }
-                current_file = key_word[i];
-				if(i_list[i].className != "dir_i") { //是文件不可进入
-					return;
-				}
-				else{
-					select_dir = (fileList[i].getElementsByTagName("span")[0]).innerText;  //存储当前点击的文件夹
-					window.localStorage.setItem('select_dir',select_dir);
-					fileShow(current_file);
-				}
-            }
-        }
-    })();
+	// 鼠标划过表格第一行不变换背景色
+	trList.eq(0).on('mousemove', function () {
+		trList.eq(0).css("background", "none");
+	});
 
 	// 屏蔽默认右键菜单
-	container.oncontextmenu = function (event) {
+	container.on('contextmenu', function (event) {
 		event.preventDefault();
-	};
-
-	// 右键文件弹出菜单
-	(function() {
-    	for(let i = 0; i < fileLen; i++) {
-            fileList[i].index = i;  //自定义属性index保存索引
-            fileList[i].isClick = false;   //定义点击开关
-    		fileList[i].onmousedown = function(e) {
-				// 右键弹出菜单
-    			if(e.button == 2) {
-					// 清除上一次左键点击的样式
-					trList[lastIndex_leftBtn].style.background = "none";
-					checkList[lastIndex_leftBtn].checked = false;
-					container.style.overflow = "hidden";
-                    this.index = i + 1;
-                    if (!(fileList[i])) {
-                        return;
-                    }
-                    else {
-                        if (this.isClick) {
-                            // 清除背景颜色
-                            trList[this.index].style.background = "none";
-                            // 不选中方框
-                            checkList[this.index].checked = false;
-                        }
-                        else {
-                            // 清除上一次点击的样式
-                            trList[lastIndex_rightBtn].style.background = "none";
-                            checkList[lastIndex_rightBtn].checked = false;
-                            // 添加背景色
-							trList[this.index].style.background = "#e8f6fd";
-							// 选中方框
-                            checkList[this.index].checked = true;
-                            lastIndex_rightBtn = this.index; //保存当前的index
-                        }
-                    }
-                    let menu = document.getElementsByClassName("menu")[0];  //右键的菜单
-                    select_file = (fileList[i].getElementsByTagName("span")[0]).innerText;  //当前点击的文件名
-					menu.style.display = 'block';
-					// 根据鼠标点击位置和浏览器顶部的距离更改菜单的位置
-					let h = mousePos(e);
-					if(h < 700) {
-						menu.style.top = h - 210 + "px";
-					}
-    				else{
-						menu.style.top = "490px";
-					}
-				}
-				// 左键关闭菜单
-    			else if(e.button == 0) {
-					container.style.overflow = "auto";
-                    menu.style.display = 'none';
-    			}
-    		}
-    	}
-	})();
-
-	// 点击路径跳转
-	let systemList = document.getElementsByClassName("file_system_a"),
-        systemLen = systemList.length;
-    (function () {
-        for(let i = 0; i < systemLen; i++) {
-            systemList[i].onclick = function () {
-				let current = systemList[i].innerText,
-					index_click = current_dir.indexOf(current),
-					jump_num = 0;
-                if(index_click !== -1) {
-					jump_num = (current_dir.length - 1) - index_click;
-					for(let i = 0; i < jump_num; i++) {
-						returnFile();
-					}
-				}
-                else{
-					jump_num = (current_dir.length - 1) - 2;
-					for(let i = 0; i < jump_num; i++) {
-						returnFile();
-					}
-				}
-            }
-        }
-    })();
+	});
 
 	// 整个页面点击鼠标左键关闭菜单
 	let html = document.getElementsByTagName("html")[0];
-	html.onclick = function(e) {
+	$("html").on('click', function (e) {
 		stopPropagation(e);
-		menu.style.display = 'none';
-	}
+		menu.css("display", "none");
+	});
 
 	// 整个页面禁止双击选中文字
-	document.onselectstart =function(){
+	document.onselectstart = function () {
 		return false;
 	}
 
-	// 鼠标经过上传按钮
-	let upload_btn = document.getElementsByClassName("upload")[0],
-		upload_ul = document.getElementsByClassName("upload_file")[0];
+	//鼠标经过/离开
+	upload_btn.on('mouseenter', function () {
+		upload_ul.css("display", "block");
+	}).on('mouseleave', function () {
+		upload_ul.css("display", "none");
+	});
 
-	//鼠标经过
-	upload_btn.onmouseenter = function () {
-		upload_ul.style.display = 'block';
-	}
-	//鼠标离开
-	upload_btn.onmouseleave = function () {
-		upload_ul.style.display = 'none';
+	// 清除上一次点击样式，并添加当前点击样式
+	function cssLeftHandle(data_index) {
+		// 清除上一次左键点击的样式
+		trList.eq(lastIndex_leftBtn).css("background", "none");
+		checkList.eq(lastIndex_leftBtn).prop("checked", false);
+		// 添加背景颜色
+		trList.eq(data_index).css("background", "#e8f6fd");
+		// 选中方框
+		checkList.eq(data_index).prop("checked", true);
+		trList.eq(data_index).attr("isClick", true);
 	}
 
-	let el = document.getElementById('file');
-    el.addEventListener('change', upload, false);
+	// 清除上一次左/右键点击的样式
+	function cleanLastHandle(btn) {
+		trList.eq(btn).css("background", "none");
+		checkList.eq(btn).prop("checked", false);
+	}
+
+	// 左键点击表格某一行添加背景色并清除上一次点击行的背景色
+	fileList.on('click', function (e) {
+		stopPropagation(e); //阻止冒泡
+		let $this = $(this);
+		$this.attr('data-index', fileList.index($this) + 1); //去掉第一行
+		// 清除所有选中框的样式
+		clearBox();
+		more_show.css("display", "block"); //显示更多按钮
+		cleanLastHandle(lastIndex_rightBtn);
+		let data_index = $this.attr('data-index');
+		if (!(trList.eq(data_index))) {
+			return;
+		}
+		else {
+			cssLeftHandle(data_index);
+			lastIndex_leftBtn = data_index; //保存当前的index
+		}
+	});
+
+	// 鼠标停留/离开时显示/隐藏每行的操作图标
+	trList.on('mouseenter', function (e) {
+		stopPropagation(e); //阻止冒泡
+		iconList.eq(trList.index($(this)) - 1).css("display", "block");
+	}).on('mouseleave', function (e) {
+		stopPropagation(e); //阻止冒泡
+		iconList.eq(trList.index($(this)) - 1).css("display", "none");
+	});
+
+	// 选中表格中的某行选择框添加背景色
+	labelList.on('click', function (e) {
+		stopPropagation(e);
+		menu.eq(0).css("display", "none");
+		let index = labelList.index($(this));
+		if (checkList.eq(index).prop("checked")) {
+			checkList.eq(index).prop("checked", false);
+			trList.eq(index).css("background", "none");
+			clearMoreBtn();
+		}
+		else {
+			checkList.eq(index).prop("checked", true);
+			trList.eq(index).css("background", "#e8f6fd");
+			clearMoreBtn();
+		}
+	});
+
+	// 左键点击查看文件夹
+	let filenameList = [],  //文件名集合
+		i_list = [];	//图标集合
+	for (let i = 0; i < fileList.length; i++) {
+		filenameList.push($(fileList[i]).find("span")[0]);
+	}
+	for (let i = 1; i < tdList.length; i++) {
+		i_list.push($(tdList[i]).find("i")[0]);
+	}
+	$(filenameList).on('click', function (e) {
+		let i = $(filenameList).index($(this));
+		stopPropagation(e);
+		more_show.css("display", "none");
+		current_file = dirs_files_data[i]; //存储当前点击的文件夹名
+		console.log(dirs_files_data)
+		if ($(i_list).eq(i).hasClass("dir_i")) { //文件夹可以点击进入
+			queryData(current_file);
+		}
+		else { //文件不可以点击进入
+			return;
+		}
+	});
+
+	// 鼠标双击某行
+	fileList.on('dblclick', function (e) {
+		stopPropagation(e);
+		let i = fileList.index($(this));
+		more_show.css("display", "none");
+		clearBox();
+		cleanLastHandle(lastIndex_rightBtn);
+		let data_index = $(this).attr('data-index');
+		if (!(trList.eq(data_index))) {
+			return;
+		}
+		else {
+			cssLeftHandle(data_index);
+			lastIndex_leftBtn = data_index; //保存当前的index
+		}
+		current_file = dirs_files_data[i];
+		if (!($(i_list).hasClass("dir_i"))) { //是文件不可进入
+			return;
+		}
+		else { //文件夹可以进入
+			queryData(current_file);
+		}
+	});
+
+	// 右键文件弹出菜单
+	fileList.on('mousedown', function (e) {
+		// 右键弹出菜单
+		if (e.button == 2) {
+			cleanLastHandle(lastIndex_leftBtn);
+			container.css("overflow", "hidden");
+			let data_index = $(this).attr('data-index');
+			if (!(fileList.eq(data_index))) {
+				return;
+			}
+			else {
+				if ($(this).attr("isClick")) {
+					// 清除背景颜色
+					trList.eq(data_index).css("background", "none");
+					// 不选中方框
+					checkList.eq(data_index).prop("checked", false);
+				}
+				else {
+					cssLeftHandle(data_index);
+					lastIndex_rightBtn = data_index; //保存当前的index
+				}
+			}
+			select_file = ($(this).find("span").eq(0)).text();  //当前点击的文件名
+			menu.css("display", "block");
+			// 根据鼠标点击位置和浏览器顶部的距离更改菜单的位置
+			let h = mousePos(e);
+			if (h < 700) {
+				menu.css("top", h - 210 + "px");
+			}
+			else {
+				menu.css("top", "490px");
+			}
+		}
+		// 左键关闭菜单
+		else if (e.button == 0) {
+			container.css("overflow", "auto");
+			menu.css("display", "none");
+		}
+	});
+
+	// 点击路径跳转
+	systemList.on('click', function () {
+		let current = $(this).text(),
+			index_click = current_dir.indexOf(current),
+			jump_num = 0;
+		if (index_click !== -1) {
+			jump_num = (current_dir.length - 1) - index_click;
+			for (let i = 0; i < jump_num; i++) {
+				returnFile();
+			}
+		}
+		else {
+			jump_num = (current_dir.length - 1) - 2;
+			for (let i = 0; i < jump_num; i++) {
+				returnFile();
+			}
+		}
+	});
 }

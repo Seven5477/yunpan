@@ -8,11 +8,13 @@
     <link rel="stylesheet" href="./static/css/transport.css">
     <script src="./static/js/jquery.min.js"></script>
     <script src="./static/js/global.js"></script>
-    <script src="./static/js/click.js"></script>
+    <script src="./static/js/index.js"></script>
+    <script src="./static/js/page_action.js"></script>
+    <script src="./static/js/action.js"></script>
     <script src="./static/js/spark-md5.min.js"></script>
     <title>Sault</title>
 </head>
-<body>
+<body onload="loadPage()">
     <div class="inner">
         <!-- 顶部 -->
         <div class="top clearfix">
@@ -275,10 +277,8 @@
         <!-- 底部 -->
         <div class="bottom"></div>
     </div>
-
-    <script src="./static/js/index.js"></script>
 </body>
-<script>
+<>
     $(".share a")[0].href = share_href;
-</script>
+</>
 </html>
