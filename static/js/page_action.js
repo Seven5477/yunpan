@@ -251,6 +251,7 @@ function addLi(index) {
 	}
 	else {   //文件夹：先把文件夹中的所有文件的上传进度表都创建完成再逐个分片
 		if (index_uploadFile_obj >= files_arr.length) {
+			index_uploadFile_obj = 0;  //文件全部完成上传，新上传的文件对象的索引归0
 			getFileMd5(0);
 		}
 		else {
@@ -724,7 +725,6 @@ function downloadFile() {
 
 	let form_data = new FormData(form);
 	form.submit();
-	isCheckAll();
 }
 
 /* 取消上传文件

@@ -232,6 +232,7 @@ function clickHandle() {
 		stopPropagation(e);
 		menu.eq(0).css("display", "none");
 		let index = labelList.index($(this));
+		if(index === 0) return;
 		if (checkList.eq(index).prop("checked")) {
 			checkList.eq(index).prop("checked", false);
 			trList.eq(index).css("background", "none");

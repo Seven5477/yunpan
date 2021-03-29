@@ -192,10 +192,10 @@ function clearMoreBtn() {
 *  @params
 *  @return
 */
-function checkAll() {
+function checkall() {
     let checkList = document.getElementsByClassName("checkbox"),  //选择框
         more_show = document.getElementsByClassName("more")[0]; //更多按钮
-
+    
     more_show.style.display = checkList[0].checked ? "block" : "none";
     for (let i = 0; i < checkList.length; i++) {
         checkList[i].checked = checkList[0].checked;
@@ -230,7 +230,6 @@ function checkSelect() {
     for (let i = 0; i < checkSelect_list.length; i++) {
         checkSelect_list[i] = "\"" + checkSelect_list[i] + "\"";
     }
-    console.log(checkSelect_list);
     return checkSelect_list;
 }
 
