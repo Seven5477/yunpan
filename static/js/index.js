@@ -151,7 +151,7 @@ function clickHandle() {
 	let upload_btn = $(".upload"),
 		upload_ul = $(".upload_file"),
 		el = $('#file')[0];
-	el.addEventListener('change', upload, false);
+	el.addEventListener('change', upload, false); //给上传文件按钮绑定点击事件
 
 	// 鼠标划过表格第一行不变换背景色
 	trList.eq(0).on('mousemove', function () {
