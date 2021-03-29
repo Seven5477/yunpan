@@ -1,44 +1,41 @@
+// 加载页面
 function loadPage() {
-    queryData(current_file);
+	queryData(current_file);
 }
 
 // 获取数据
 function queryData(ret) {
-    let index_data = `{"Opt":0,"DirName":["${ret}"]}`;
-    console.log(index_data);
-    $.ajax({
-        url: home_rpc,
-        data: index_data,
-        type: "POST",
-        async: false,
-        success: function (data) {
-            if (data) {
-                _DATA = data;
-                return true;
-            }
-            else {
-                return false;
-            }
-        },
-        error: function () {
-            alert("Network error!")
-        }
-    });
-    bindHTML();
-    clickHandle();
+	let index_data = `{"Opt":0,"DirName":["${ret}"]}`;
+	console.log(index_data);
+	$.ajax({
+		url: home_rpc,
+		data: index_data,
+		type: "POST",
+		async: false,
+		success: function (data) {
+			if (data) {
+				_DATA = data;
+				return true;
+			}
+			else {
+				return false;
+			}
+		},
+		error: function () {
+			alert("Network error!")
+		}
+	});
+	bindHTML();
+	clickHandle();
 }
 
 // 把数据绑定在页面中
 function bindHTML() {
-	console.log("bind")
 	if (!_DATA) return;
-	let htmlStr = ``;
-	dirs_files_data = [];
-	index = 0,
-	tbody = $("<tbody></tbody>");  //创建tbody用于存储目录结构
-	table.append(tbody);
-
-	console.log(tbody);
+	let file_system = $(".file_system"),  //当前所在文件路径
+		htmlStr = ``,
+		tbody = $("tbody").eq(1);
+	index = 0;
 
 	// 遍历数据(json格式)
 	for (let key in _DATA) {
@@ -137,6 +134,8 @@ function bindHTML() {
 
 // 处理点击
 function clickHandle() {
+	let container = $(".content"),  //文件目录表格所在的区域
+		menu = $(".menu");  //右键的菜单
 	let trList = $("tr"), //每一行文件
 		checkList = $(".checkbox"),  //文件左侧的选择框
 		fileList = $(".file_name"), //文件名集合
@@ -148,11 +147,10 @@ function clickHandle() {
 		lastIndex_leftBtn = 0,  //左键的上一次点击
 		lastIndex_rightBtn = 0;  //右键的上一次点
 
-	// 鼠标经过上传按钮
+	// 鼠标经过上传按钮显示上传和上传文件夹选项
 	let upload_btn = $(".upload"),
 		upload_ul = $(".upload_file"),
 		el = $('#file')[0];
-
 	el.addEventListener('change', upload, false);
 
 	// 鼠标划过表格第一行不变换背景色
@@ -166,7 +164,6 @@ function clickHandle() {
 	});
 
 	// 整个页面点击鼠标左键关闭菜单
-	let html = document.getElementsByTagName("html")[0];
 	$("html").on('click', function (e) {
 		stopPropagation(e);
 		menu.css("display", "none");
@@ -177,7 +174,7 @@ function clickHandle() {
 		return false;
 	}
 
-	//鼠标经过/离开
+	//鼠标经过/离开上传按钮显示/隐藏上传选项
 	upload_btn.on('mouseenter', function () {
 		upload_ul.css("display", "block");
 	}).on('mouseleave', function () {
@@ -261,8 +258,8 @@ function clickHandle() {
 		stopPropagation(e);
 		more_show.css("display", "none");
 		current_file = dirs_files_data[i]; //存储当前点击的文件夹名
-		console.log(dirs_files_data)
 		if ($(i_list).eq(i).hasClass("dir_i")) { //文件夹可以点击进入
+			dirs_files_data = [];
 			queryData(current_file);
 		}
 		else { //文件不可以点击进入
@@ -290,6 +287,7 @@ function clickHandle() {
 			return;
 		}
 		else { //文件夹可以进入
+			dirs_files_data = [];
 			queryData(current_file);
 		}
 	});
@@ -334,20 +332,21 @@ function clickHandle() {
 		}
 	});
 
-	// 点击路径跳转
+	// 点击路径跳转文件夹
 	systemList.on('click', function () {
-		let current = $(this).text(),
-			index_click = current_dir.indexOf(current),
+		let current = $(this).text(), //当前点击路径名
+			index_find = current_dir.indexOf(current),  //在已存的点击的文件夹集合里找当前点击路径名
 			jump_num = 0;
-		if (index_click !== -1) {
-			jump_num = (current_dir.length - 1) - index_click;
+		if (index_find !== -1) {
+			jump_num = (current_dir.length - 1) - index_find; //跳转次数
 			for (let i = 0; i < jump_num; i++) {
 				returnFile();
 			}
 		}
-		else {
+		else { //点击的路径名为“全部文件”时跳转到根目录下
 			jump_num = (current_dir.length - 1) - 2;
 			for (let i = 0; i < jump_num; i++) {
+				console.log("***jump第" + i + "次");
 				returnFile();
 			}
 		}

@@ -398,7 +398,7 @@ input:checked+.check {
     width: 200px;
 }
 .new_input{
-    margin-left: 30px;
+    margin-left: 10px;
     width: 256px;
     height: 30px;
     text-indent: 4px;

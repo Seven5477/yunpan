@@ -49,9 +49,9 @@ function bytesToSize(bytes) {
     return (bytes / Math.pow(k, i)).toFixed(2) + ' ' + sizes[i];
 }
 
-/* 转换字节
+/* 删除最后一个子元素
 *  @params
-*      e 父节点
+*      e 元素
 *  @return
 */
 function deleteChild(e) {
@@ -78,8 +78,8 @@ function addZero(s) {
 *  @return
 */
 function addList(file) {
-    if (select_list.indexOf(file) == -1) {
-        select_list.push(file);
+    if (delete_list.indexOf(file) == -1) {
+        delete_list.push(file);
     }
     else {
         return;
@@ -146,9 +146,9 @@ function isFileType(flieName) {
 *  @return
 */
 function returnFile() {
-	console.log("returnFile")
-	current_file = "..";
-	queryData(current_file);
+    console.log("returnFile")
+    current_file = "..";
+    queryData(current_file);
 }
 
 /* 清除选中框样式
@@ -205,7 +205,7 @@ function checkall() {
 /* 将勾选的数据添加到数组中
 *  @params
 *  @return
-*      select_list [array] 选择的文件数组
+*      delete_list [array] 选择的文件数组
 */
 function checkSelect() {
     let checkList = document.getElementsByClassName("checkbox"),  //选择框
@@ -216,10 +216,11 @@ function checkSelect() {
             addList(fileList[i - 1].innerText);
         }
     }
-    for (let i = 0; i < select_list.length; i++) {
-        select_list[i] = "\"" + select_list[i] + "\"";
+    for (let i = 0; i < delete_list.length; i++) {
+        delete_list[i] = "\"" + delete_list[i] + "\"";
     }
-    return select_list;
+    console.log(delete_list)
+    return delete_list;
 }
 
 /* 鼠标点击位置到浏览器顶部的距离
@@ -233,6 +234,149 @@ function mousePos(e) {
     let scrollY = document.documentElement.scrollTop || document.body.scrollTop;  //分别兼容ie和chrome
     let height = e.pageY || (e.clientY + scrollY);  //兼容火狐和其他浏览器
     return height;
+}
+
+/* 新建文件夹
+*  @params
+*  @return
+*/
+function isNew() {
+    if (!newClick) {
+        newFile();
+    }
+    else {
+        let new_input = document.getElementsByClassName("new_input")[0];
+        new_input.focus();
+    }
+}
+
+/* 新建文件夹
+*  @params
+*  @return
+*/
+function newFile() {
+    newClick = true;
+    // 回到顶部
+    $('html,body').animate({ scrollTop: '0px' }, 800);
+    let con = $(".content"),
+        htmlStr = ``,
+        tbody = $("tbody").eq(1);
+    con.scrollTop(0);
+
+    // 文件创建时间
+    let myDate = new Date();
+    let month = addZero(myDate.getMonth() + 1),
+        date = addZero(myDate.getDate()),
+        hour = addZero(myDate.getHours()),
+        min = addZero(myDate.getMinutes()),
+        sec = addZero(myDate.getSeconds()),
+        timeText = myDate.getFullYear() + "-" + month + "-" + date + " " + hour + ":" + min + ":" + sec;
+    htmlStr = `
+        <tr class="trstyle">
+            <td class="tdwidthbox">
+                <label class="checklabel">
+                    <input type="checkbox" class="checkbox">
+                    <i class="check"></i>
+                </label>
+            </td>
+            <td class="tdwidth1">
+                <div class="file_name">
+                    <input type="text" class="new_input">
+                    <span class="icon">
+                        <i class="icon_1"></i>
+                        <i class="icon_2"></i>
+                    </span>
+                </div>
+                <label class="dir_label">
+                    <i class="dir_i"></i>
+                </label>
+            </td>
+            <td class="tdwidth2">-</td>
+            <td class="tdwidth3">${timeText}</td>
+        </tr>
+    `;
+    tbody.prepend(htmlStr);
+
+    let icon = $(".icon"),
+        icon_save = $(".icon_1"),
+        icon_cancel = $(".icon_2"),
+        new_input = $(".new_input");
+
+    // 保存按钮
+    icon_save.on('click', function (e) {
+        stopPropagation(e);
+        let input_value = new_input.val();  //获取文本框的数据
+        if (!input_value) {
+            alert("文件名称不能为空，请重新输入！");
+            new_input.focus(); //光标回到输入框内
+        }
+        else {
+            // 验证文件名
+            if (!validateFileName(input_value)) {
+                alert("文件名不能包含以下字符:[\\\\/:*?\"<>|]");
+                new_input.focus();  //光标定位到输入框中
+            }
+            else {
+                let new_data = `{"Opt":1,"DirName":["${input_value}"]}`;
+                $.ajax(
+                    {
+                        url: home_rpc,
+                        data: new_data,
+                        type: "POST",
+                        async: false,
+                        success: function (data) {
+                            if (data.code == 1000) {
+                                // 隐藏新建文件夹的框，使添加的文件直接加入表格中
+                                new_input[0].className = "hide";
+                                icon_save[0].className = "hide";
+                                icon_cancel[0].className = "hide";
+                                console.log(icon)
+                                icon[0].className = "";
+                                icon[0].innerText = input_value;
+                                current_file = ".";
+                                queryData(current_file);
+                                return true;
+                            }
+                            else {
+                                alert(data.description);
+                                return false;
+                            }
+                        },
+                        error: function () {
+                            alert("Network error!")
+                        }
+                    });
+            }
+        }
+        newClick = false;
+    });
+
+    // 取消按钮
+    icon_cancel.onclick = function () {
+        queryData(current_file);
+        newClick = false;
+    }
+}
+
+/* 文件查看刷新
+*  @params
+*      ret [string] 当前文件夹
+*  @return 
+*/
+function refresh() {
+    let dir = ".";
+    let icon_refresh = document.getElementsByClassName("iconfont-refresh")[0],
+        rotateval = 0;
+    function rot() {
+        rotateval = rotateval + 1;
+        if (rotateval === 360) {
+            clearInterval(interval);
+            rotateval = 0;
+            queryData(dir);
+        }
+        icon_refresh.style.transform = 'rotate(' + rotateval + 'deg)';
+    }
+    let interval = setInterval(rot, 5);
 }
 
 /* 添加文件对象到一个大对象中
@@ -417,7 +561,7 @@ function isEmptyUpload() {
         info = nothing.children(".info"),
         len = 0;
     $.each(liList, function (index, item) {
-        if ($(item).css(display) !== "none") len++;
+        if ($(item).css("display") !== "none") len++;
     });
     // 判断列表内是否有任务
     if (len === 0) {

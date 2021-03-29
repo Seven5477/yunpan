@@ -1,4 +1,3 @@
-
 // 添加上传文件任务的进度表
 function addLi(i) {
 	let file = null;
@@ -14,7 +13,7 @@ function addLi(i) {
 	console.log("file_name:" + file_name);
 	console.log("fileSize:" + file_size);
 	console.log("dir:" + current_file);
-	newLoadli(file_name, file_size, dir);
+	newLoadli(file_name, file_size, current_file);
 	end_lastLi = true;
 	indexLi++;
 	if (upload_type === 1) {
@@ -392,7 +391,11 @@ function uploadEver(index) {
 function deleteFile() {
 	current_file = ".";
 	checkSelect();
-	let del_data = `{"Opt":2,"DirName":["${select_list}"]}`;
+	let del_data = `{"Opt":2,"DirName":[${delete_list}]}`;
+	if(delete_list.length === 0) {
+		alert("请先选择文件！");
+		return;
+	}
 	$.ajax(
 		{
 			url: home_rpc,
@@ -404,7 +407,7 @@ function deleteFile() {
 					console.log(data.description);
 					let menu = document.getElementsByClassName("menu")[0];  //右键的菜单
 					menu.style.display = "none";
-					select_list = [];
+					delete_list = [];
 					queryData(current_file);
 					clearMoreBtn();
 					return true;
@@ -426,47 +429,46 @@ function deleteFile() {
 */
 function toTransport() {
 	current_file = ".";
-	let upload_module = document.getElementsByClassName("upload-progress")[0], //上传
-		uploadList = document.getElementById("uploadList"),
-		download_module = document.getElementsByClassName("download-progress")[0], //下载
-		nav_title = document.getElementsByClassName("nav-title")[0],
-		netdisk = nav_title.getElementsByTagName("li")[0],
-		transport = nav_title.getElementsByTagName("li")[1],
-		transport_content = document.getElementsByClassName("transport-content")[0],
-		main_content = document.getElementsByClassName("main-content")[0],
-		disk = document.getElementsByClassName("disk")[0],
-		trans = document.getElementsByClassName("trans")[0],
-		download = trans.getElementsByTagName("div")[0], //左侧下载菜单
-		upload = trans.getElementsByTagName("div")[1]; //左侧上传菜单
+	let upload_module = $(".upload-progress"), //上传
+		download_module = $(".download-progress")[0], //下载
+		netdisk = $(".nav-title li").eq(0),
+		transport = $(".nav-title li").eq(1),
+		transport_content = $(".transport-content"),
+		main_content = $(".main-content"),
+		disk = $(".disk"),
+		trans = $(".trans"),
+		download = $(".trans div").eq(0), //左侧下载菜单
+		upload = $(".trans div").eq(1); //左侧上传菜单
 	// 顶部导航的显示
-	main_content.style.display = "none";
-	disk.style.display = "none";
-	netdisk.className = "";
-	transport_content.style.display = "block";
-	trans.style.display = "block";
-	transport.className = "active";
+	main_content.css("display", "none");
+	disk.css("display", "none");
+	netdisk[0].className = "";
+	transport_content.css("display", "block");
+	trans.css("display", "block");
+	transport[0].className = "active";
 
 	isEmptyUpload();
 
 	// 点击下载
 	download.onclick = function () {
-		download.style.background = "#e2ddec";
-		upload.style.background = "#f8f7f7";
-		upload_module.style.display = "none"
-		download_module.style.display = "block";
+		download.css("background", "#e2ddec");
+		upload.css("background", "#f8f7f7");
+		upload_module.css("display", "none");
+		download_module.css("display", "block");
 		isEmptyDownload();
 	}
 
 	// 点击上传
 	upload.onclick = function () {
-		upload.style.background = "#e2ddec";
-		download.style.background = "#f8f7f7";
-		download_module.style.display = "none";
-		upload_module.style.display = "block";
+		upload.css("background", "#e2ddec");
+		download.css("background", "#f8f7f7");
+		download_module.css("display", "none");
+		upload_module.css("display", "block");
 		isEmptyUpload();
 	}
 
-	let liList = uploadList.getElementsByTagName("li"),
+	let uploadList = $("#uploadList")[0],
+		liList = uploadList.getElementsByTagName("li"),
 		total = document.getElementsByClassName("total")[0],
 		operationList = document.getElementsByClassName("file-operate"),
 		opeLen = operationList.length;
@@ -510,19 +512,18 @@ function toTransport() {
 *  @return
 */
 function toDisk() {
-	let nav_title = document.getElementsByClassName("nav-title")[0],
-		netdisk = nav_title.getElementsByTagName("li")[0],
-		transport = nav_title.getElementsByTagName("li")[1],
-		transport_content = document.getElementsByClassName("transport-content")[0],
-		main_content = document.getElementsByClassName("main-content")[0],
-		disk = document.getElementsByClassName("disk")[0],
-		trans = document.getElementsByClassName("trans")[0];
-	main_content.style.display = "block";
-	disk.style.display = "block";
-	netdisk.className = "active";
-	transport_content.style.display = "none";
-	trans.style.display = "none";
-	transport.className = "";
+	let netdisk = $(".nav-title li").eq(0),
+		transport = $(".nav-title li").eq(1),
+		transport_content = $(".transport-content"),
+		main_content = $(".main-content"),
+		disk = $(".disk"),
+		trans = $(".trans");
+	main_content.css("display", "block");
+	disk.css("display", "block");
+	netdisk[0].className = "active";
+	transport_content.css("display", "none");
+	trans.css("display", "none");
+	transport[0].className = "";
 }
 
 /* 全部暂停下载

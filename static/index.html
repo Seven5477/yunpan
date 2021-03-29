@@ -8,9 +8,8 @@
     <link rel="stylesheet" href="./static/css/transport.css">
     <script src="./static/js/jquery.min.js"></script>
     <script src="./static/js/global.js"></script>
-    <script src="./static/js/index.js"></script>
-    <script src="./static/js/page_action.js"></script>
     <script src="./static/js/action.js"></script>
+    <script src="./static/js/page_action.js"></script>
     <script src="./static/js/spark-md5.min.js"></script>
     <title>Sault</title>
 </head>
@@ -143,17 +142,20 @@
                     <!-- 文件目录和详情 -->
                     <div class="content">
                         <table>
-                            <tr class="trstyle">
-                                <td class="tdwidthbox">
-                                    <label onclick="checkall()" class="checklabel">
-                                        <input type="checkbox" class="checkbox">
-                                        <i class="check"></i>
-                                    </label>
-                                </td>
-                                <td class="tdwidth1">文件名</td>
-                                <td class="tdwidth2">大小</td>
-                                <td class="tdwidth3">修改日期</td>
-                            </tr>
+                            <tbody>
+                                <tr class="trstyle">
+                                    <td class="tdwidthbox">
+                                        <label onclick="checkall()" class="checklabel">
+                                            <input type="checkbox" class="checkbox">
+                                            <i class="check"></i>
+                                        </label>
+                                    </td>
+                                    <td class="tdwidth1">文件名</td>
+                                    <td class="tdwidth2">大小</td>
+                                    <td class="tdwidth3">修改日期</td>
+                                </tr>
+                            </tbody>
+                            <tbody></tbody>
                         </table>
                         <!-- 右键菜单 -->
                         <ul class="menu">
@@ -277,8 +279,9 @@
         <!-- 底部 -->
         <div class="bottom"></div>
     </div>
+    <script src="./static/js/index.js"></script>
 </body>
-<>
+<script>
     $(".share a")[0].href = share_href;
-</>
+</script>
 </html>

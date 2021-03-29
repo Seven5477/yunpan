@@ -16,11 +16,6 @@ let login_rpc = "http://" + host + "/login_auth",
     download_rpc = "http://" + host + "/download",
     uploadreq_rpc = "http://" + host + "/upload_request";
 
-let container = $(".content"),  //文件目录表格所在的区域
-    menu = $(".menu"),  //右键的菜单
-    file_system = $(".file_system"),  //当前所在文件路径
-    table = $("table"); //表格
-
 let _DATA,  //目录数据(JSON格式)
     dirs_files_data = [],  //存储所有文件夹名和文件名
     index = 0;  //key_word的索引
@@ -30,8 +25,8 @@ let username = localStorage.getItem("user"), //用户名
     select_file = "",  //选中的文件
     select_dir = "",  //当前点击的目录
     current_dir = [],  //当前路径数组
-    select_list = [],  //选中的文件数组，用于删除
-    newClick = false, //新建文件夹调用标识
+    delete_list = [],  //选中的文件数组，用于删除
+    newClick = false, //新建文件夹正在被调用标识
     md5_file = null,
     /*切片需要的变量*/
     chunkNum = 0, //分片数
