@@ -147,6 +147,10 @@ function clickHandle() {
 		lastIndex_leftBtn = 0,  //左键的上一次点击
 		lastIndex_rightBtn = 0;  //右键的上一次点
 
+	trList.each(function (index, item) {
+		$(this).attr("data-index", index);
+	});
+
 	// 鼠标经过上传按钮显示上传和上传文件夹选项
 	let upload_btn = $(".upload"),
 		upload_ul = $(".upload_file"),
@@ -185,6 +189,7 @@ function clickHandle() {
 	function cssLeftHandle(data_index) {
 		// 清除上一次左键点击的样式
 		trList.eq(lastIndex_leftBtn).css("background", "none");
+		trList.eq(lastIndex_leftBtn).attr("isClick", false);
 		checkList.eq(lastIndex_leftBtn).prop("checked", false);
 		// 添加背景颜色
 		trList.eq(data_index).css("background", "#e8f6fd");
@@ -196,18 +201,19 @@ function clickHandle() {
 	// 清除上一次左/右键点击的样式
 	function cleanLastHandle(btn) {
 		trList.eq(btn).css("background", "none");
+		trList.eq(btn).attr("isClick", false);
 		checkList.eq(btn).prop("checked", false);
 	}
 
 	// 左键点击表格某一行添加背景色并清除上一次点击行的背景色
-	fileList.on('click', function (e) {
+	trList.on('click', function (e) {
 		stopPropagation(e); //阻止冒泡
 		let $this = $(this);
-		$this.attr('data-index', fileList.index($this) + 1); //去掉第一行
 		// 清除所有选中框的样式
 		clearBox();
 		more_show.css("display", "block"); //显示更多按钮
 		cleanLastHandle(lastIndex_rightBtn);
+		cleanLastHandle(lastIndex_leftBtn);
 		let data_index = $this.attr('data-index');
 		if (!(trList.eq(data_index))) {
 			return;
@@ -232,7 +238,7 @@ function clickHandle() {
 		stopPropagation(e);
 		menu.eq(0).css("display", "none");
 		let index = labelList.index($(this));
-		if(index === 0) return;
+		if (index === 0) return;
 		if (checkList.eq(index).prop("checked")) {
 			checkList.eq(index).prop("checked", false);
 			trList.eq(index).css("background", "none");
@@ -294,36 +300,35 @@ function clickHandle() {
 	});
 
 	// 右键文件弹出菜单
-	fileList.on('mousedown', function (e) {
+	trList.on('mousedown', function (e) {
 		// 右键弹出菜单
 		if (e.button == 2) {
-			cleanLastHandle(lastIndex_leftBtn);
+			cleanLastHandle(lastIndex_rightBtn);
 			container.css("overflow", "hidden");
 			let data_index = $(this).attr('data-index');
-			if (!(fileList.eq(data_index))) {
+			if (!(trList.eq(data_index))) {
 				return;
 			}
 			else {
-				if ($(this).attr("isClick")) {
-					// 清除背景颜色
-					trList.eq(data_index).css("background", "none");
-					// 不选中方框
-					checkList.eq(data_index).prop("checked", false);
-				}
-				else {
-					cssLeftHandle(data_index);
-					lastIndex_rightBtn = data_index; //保存当前的index
-				}
+				cssLeftHandle(data_index);
+				lastIndex_rightBtn = data_index; //保存当前的index
 			}
 			select_file = ($(this).find("span").eq(0)).text();  //当前点击的文件名
 			menu.css("display", "block");
 			// 根据鼠标点击位置和浏览器顶部的距离更改菜单的位置
-			let h = mousePos(e);
-			if (h < 700) {
-				menu.css("top", h - 210 + "px");
+			let obj = mousePos(e);
+			console.log(obj)
+			if (obj.width > 420) {
+				menu.css("left", obj.width - 330 + "px");
 			}
 			else {
-				menu.css("top", "490px");
+				menu.css("left", "90px");
+			}
+			if (obj.height < 700) {
+				menu.css("top", obj.height - 108 + "px");
+			}
+			else {
+				menu.css("top", "570px");
 			}
 		}
 		// 左键关闭菜单

@@ -237,13 +237,18 @@ function checkSelect() {
 *  @params
 *      e 
 *  @return
-*      height [number] 高度
+*      {width,height} [object] 宽高
 */
 function mousePos(e) {
     e = e || window.event;
-    let scrollY = document.documentElement.scrollTop || document.body.scrollTop;  //分别兼容ie和chrome
-    let height = e.pageY || (e.clientY + scrollY);  //兼容火狐和其他浏览器
-    return height;
+    let scrollW = document.documentElement.scrollLeft || document.body.scrollLeft;  //分别兼容ie和chrome
+    let scrollY = document.documentElement.scrollTop || document.body.scrollTop;
+    let width = e.pageX || (e.clientX + scrollW);  //兼容火狐和其他浏览器
+    let height = e.pageY || (e.clientY + scrollY);
+    return {
+        width: width,
+        height: height
+    };
 }
 
 /* 添加文件对象到一个大对象中

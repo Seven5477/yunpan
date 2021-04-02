@@ -13,7 +13,7 @@
         <div class="form">
             <!-- 登录tittle -->
             <h2>
-                <span>登录</span>
+                <span>索特网盘</span>
             </h2>
             <!-- 中间填写区域 -->
             <div class="form-area">
@@ -24,10 +24,12 @@
                 <!-- 账号 -->
                 <div class="form-item name">
                     <input type="text" name="username" placeholder="请输入账号" maxlength="16">
+                    <span class="clear" onclick="clearName()">x</span>
                 </div>
                 <!-- 密码 -->
                 <div class="form-item pwd">
                     <input type="password" name="password" placeholder="请输入密码" maxlength="16">
+                    <span class="clear" onclick="clearPassword()">x</span>
                 </div>
                 <!-- 登录按钮 -->
                 <div class="form-item login">
@@ -54,6 +56,20 @@
                 var btn = document.getElementsByTagName("button")[0];
                 btn.click();  //xxxx为登录按钮的id
             }
+        }
+
+        // 清除用户名
+        function clearName() {
+            let username = $(".name input");
+            username.val("");
+            username.focus();
+        }
+
+        // 清除密码
+        function clearPassword() {
+            let password = $(".pwd input");
+            password.val("");
+            password.focus();
         }
 
         // 登录
