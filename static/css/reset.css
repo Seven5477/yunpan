@@ -6,11 +6,8 @@
     font: inherit;
     vertical-align: baseline;
 }
-ul{
-    list-style: none;
-}
 li{
-    text-decoration: none;
+    list-style: none;
 }
 a{
     text-decoration: none;
@@ -20,4 +17,16 @@ button{
 }
 input{
     outline: none;
+}
+.fl{
+    float: left;
+}
+.fr{
+    float: right;
+}
+/* 清除浮动 */
+.clearfix:after{
+    content: "";
+    display: block;
+    clear: both;
 }
