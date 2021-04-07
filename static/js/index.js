@@ -36,7 +36,6 @@ function bindHTML() {
 	let file_system = $(".file_system"),  //当前所在文件路径
 		htmlStr = ``,
 		tbody = $("tbody").eq(1);
-	index = 0;
 
 	// 遍历数据(json格式)
 	for (let key in _DATA) {
@@ -46,7 +45,6 @@ function bindHTML() {
 				if (_DATA[key]) {
 					_DATA[key].forEach(item => {
 						let { dir_name, size, modification_time } = item;
-						index++;
 						htmlStr += `
 							<tr class="trstyle">
 								<td class="tdwidthbox">
@@ -79,7 +77,6 @@ function bindHTML() {
 				if (_DATA[key]) {
 					_DATA[key].forEach(item => {
 						let { file_name, size, modification_time } = item;
-						index++;
 						htmlStr += `
 								<tr class="trstyle">
 									<td class="tdwidthbox">

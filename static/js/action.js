@@ -6,6 +6,11 @@ function logout() {
     window.location.href = logout_href;
 }
 
+// 回到首页
+function returnIndex() {
+    window.location.href = index_href;
+}
+
 /* 校验文件名是否合理
 *  @params
 *      fileName 文件名
@@ -141,14 +146,28 @@ function isFileType(flieName) {
     return className;
 }
 
+// 清除选中样式
+function cleanCheckCss(current_dom) {
+    let check = current_dom.find(".checkbox");
+    current_dom.css("background", "none");
+    current_dom.attr("isClick", false);
+    check.prop("checked", false);
+}
+
 /* 返回上一级目录
 *  @params
 *  @return
 */
 function returnFile() {
+    if (current_dirname_arr.length === 2) {
+        let last_file = $(".last_file");
+        last_file.css("cursor", "inherit");
+        last_file.css("color", "#000");
+    }
     current_dirname_arr.pop();
+    // 在当前文件夹名前加"/"
     current_path = current_dirname_arr.join('/');
-	queryData(current_path);
+    queryData(current_path);
 }
 
 /* 清除选中框样式
@@ -195,7 +214,7 @@ function clearMoreBtn() {
 function checkall() {
     let checkList = document.getElementsByClassName("checkbox"),  //选择框
         more_show = document.getElementsByClassName("more")[0]; //更多按钮
-    
+
     more_show.style.display = checkList[0].checked ? "block" : "none";
     for (let i = 0; i < checkList.length; i++) {
         checkList[i].checked = checkList[0].checked;
@@ -208,7 +227,7 @@ function checkall() {
 */
 function isCheckAll() {
     let checkFirst = document.getElementsByClassName("checkbox")[0];
-    if(checkFirst.checked) {
+    if (checkFirst.checked) {
         checkFirst.checked = false;
     }
 }
@@ -290,8 +309,8 @@ function chunk(fileSize) {
     }
     //文件大小大于10G
     else {
-        alert("文件大小超过10G，请分卷压缩后上传！");
-        chunkSize = 0;
+        chunkSize = Math.ceil(fileSize / 200); //分为200份
+        console.log("大于10G: " + chunkSize);
     }
     return chunkSize;
 }
@@ -304,9 +323,9 @@ function isEmptyUpload() {
     let liList = $("#uploadList li"),
         nothing = $(".nothing"),
         progress = $(".upload-progress"),
-        upload_img = nothing.children("img").eq(0),
-        download_img = nothing.children("img").eq(1),
-        info = nothing.children(".info"),
+        upload_img = nothing.find("img").eq(0),
+        download_img = nothing.find("img").eq(1),
+        info = nothing.find(".info"),
         len = 0;
     $.each(liList, function (index, item) {
         if ($(item).css("display") !== "none") len++;
@@ -333,9 +352,9 @@ function isEmptyDownload() {
     let liList = $("#downloadList li"),
         nothing = $(".nothing"),
         progress = $(".download-progress"),
-        upload_img = nothing.children("img").eq(0),
-        download_img = nothing.children("img").eq(1),
-        info = nothing.children(".info"),
+        upload_img = nothing.find("img").eq(0),
+        download_img = nothing.find("img").eq(1),
+        info = nothing.find(".info"),
         len = 0;
     $.each(liList, function (index, item) {
         if ($(item).css(display) !== "none") len++;

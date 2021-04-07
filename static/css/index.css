@@ -27,6 +27,7 @@ html,body{
 .top .logo h1{
     font-size: 28px;
     color: #153e4c;
+    cursor: pointer;
 }
 .top .line{
     height: 40px;
@@ -134,16 +135,9 @@ html,body{
     background: #eaeaea;
     color: #3b97b7;
 }
-.main .left .active{
-    background: #eaeaea;
-}
 .main .left .title a{
     font-size: 18px;
     color: #666;
-}
-.main .left .title.active a
-{
-    color: #3b97b7;
 }
 .main .left .title i:active{
     color: #3b97b7;
