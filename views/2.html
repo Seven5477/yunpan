@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+</head>
+
+<body>
+    <div>
+        Worker 输出内容：<span id='app'></span>
+        <input type='text' title='' id='msg'>
+        <button onclick='sendMessage()'>发送</button>
+        <button onclick='stopWorker()'>stop!</button>
+    </div>
+    <script>
+        if (typeof (Worker) === 'undefined')    // 使用Worker前检查一下浏览器是否支持
+            document.writeln(' Sorry! No Web Worker support.. ')
+        else {
+            let worker = new Worker('1.js')
+            worker.onmessage = ev => {
+                document.getElementById('app').innerHTML = ev.data
+            }
+
+
+            function sendMessage() {
+                const msg = document.getElementById('msg')
+                worker.postMessage(msg.value)
+            }
+
+        }
+
+    </script>
+</body>
+
+</html>

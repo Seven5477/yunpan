@@ -55,7 +55,7 @@
 }
 .main .right .head h3 .head-title .total-process{
     display: inline-block;
-    width: 590px;
+    width: 70%;
     height: 20px;
     vertical-align: middle;
     margin: 0 20px;
@@ -72,7 +72,7 @@
 }
 .main .right .head .control{
     position: absolute;
-    right: 43px;
+    right: 78px;
     top: 10px;
 }
 .main .right .head .control button{

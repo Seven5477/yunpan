@@ -44,16 +44,24 @@ let username = localStorage.getItem("user"), //用户名
     chunkNum_uploaded = 1, //准备上传第几片
     end = 0, //每一片的结束字节
 
+    // 计算MD5需要的变量
+    fileReader = new FileReader(),
+    md5 = null,
+    md5_sum = null,  //MD5值
+    end_md5 = true,
+    e_obj = null,
+
     // 上传文件（夹）需要的变量
     upload_type = null, //上传类型: 1是文件，2是文件夹
     end_lastUpload = true, //上一个文件上传结束的标识
 
-    md5_sum = null,  //MD5值
-    file_obj = null, //正在上传的当前文件对象
+    file_choose = null,  //当前选择的文件，用于创建上传进度条
+    file_obj = null,  //正在上传的当前文件对象
     fileName = null,  //正在上传的当前文件的文件名
     fileSize = 0;  //正在上传的当前文件的文件大小
     uploadFile_Obj = {
-        length: 0
+        length: 0,
+        totalSize: 0
     },  //存储当前上传文件对象
     index_uploadFile_Obj = 0,  //即将上传的文件对象的索引，用于添加多少个上传进度表和上传文件夹
     formObj = {
@@ -70,17 +78,17 @@ let username = localStorage.getItem("user"), //用户名
     currentRequest_arr = [],  //当前上传请求所在的数组
     argItem = [],  //保存每个文件的文件名、MD5值和request请求
     
-    
-
     // 上传文件夹需要的变量
-    files_arr = null, //文件夹里包含的文件对象组成的数组
-    file_index = 0, //文件夹里的文件数组的索引
+    files_Obj = null, //文件夹里包含的文件对象组成的fileList对象
+    li_index = 0,  //每个文件上传进度表索引
+    index_files_Obj = 0, //即将上传的fileList对象的索引
     
 
     // 上传进度表需要的变量
-    end_lastLi = true, //上一个进度表结束的标识
-    process_global = 0, //每个文件总进度总进度
-    total_percent = []; //总进度条数组：里面的值为每个文件的总进度，数组里的值相加能得到总进度条的值
+    end_lastLi = true,  //上一个进度表结束的标识
+    last_endindex = 0,
+    total_size = 0,  //上传列表的总字节数
+    total_arr = [];  ///每个文件已上传字节数存入数组中，thisIndex作为索引，故索引下的值一直在变化，用于计算总进度
 
 
 let result = null,

@@ -80,32 +80,31 @@ function newFile() {
 			}
 			else {
 				let new_data = `{"dir_option":"dir_option_create","dir_name":["${input_value}"]}`;
-				$.ajax(
-					{
-						url: home_rpc,
-						data: new_data,
-						type: "POST",
-						async: false,
-						success: function (result) {
-							if (result.code === 0) {
-								// 隐藏新建文件夹的框，使添加的文件直接加入表格中
-								new_input[0].className = "hide";
-								icon_save[0].className = "hide";
-								icon_cancel[0].className = "hide";
-								icon[0].className = "";
-								icon[0].innerText = input_value;
-								queryData(current_path);
-								return true;
-							}
-							else {
-								alert(result.msg);
-								return false;
-							}
-						},
-						error: function () {
-							alert("Network error!")
+				$.ajax({
+					url: home_rpc,
+					data: new_data,
+					type: "POST",
+					async: false,
+					success: function (result) {
+						if (result.code === 0) {
+							// 隐藏新建文件夹的框，使添加的文件直接加入表格中
+							new_input[0].className = "hide";
+							icon_save[0].className = "hide";
+							icon_cancel[0].className = "hide";
+							icon[0].className = "";
+							icon[0].innerText = input_value;
+							queryData(current_path);
+							return true;
 						}
-					});
+						else {
+							alert(result.msg);
+							return false;
+						}
+					},
+					error: function () {
+						alert("Network error!")
+					}
+				});
 			}
 		}
 		newClick = false;
@@ -114,7 +113,7 @@ function newFile() {
 	// 保存按钮
 	icon_save.on('click', function (e) {
 		stopPropagation(e);
-		newFileSave
+		newFileSave();
 	});
 
 	// 取消按钮
@@ -128,7 +127,6 @@ function newFile() {
 function deleteFile() {
 	checkSelect();
 	let del_data = `{"dir_option":"dir_option_remove","dir_name":[${checkSelect_list}]}`;
-	console.log(del_data)
 	if (checkSelect_list.length === 0) {
 		alert("请先选择文件！");
 		return;
@@ -314,19 +312,22 @@ function pauseList() {
 // 上传文件
 function upload(e) {
 	upload_type = 1; //上传文件
-	let file_choose = document.getElementById('file').files[0],  //获取上传的文件对象
-		form_info = new FormData(document.getElementById('filename'));  //获取上传的文件的formdata信息
-	// 把上传的单个文件的formdata信息放入formObj
-	formObj = addFileObj(form_info, formObj);
-	// 把上传的单个文件对象放入uploadFile_obj
-	uploadFile_Obj = addFileObj(file_choose, uploadFile_Obj);
-	// 把操作对象e放入eObj
-	eObj = addFileObj(e, eObj);
-	// 当前上传的单个请求所在的数组放入requestObj
-	requestObj = addFileObj(currentRequest_arr, requestObj);
-	if (end_lastLi) {  //如果上一个进度表创建完毕，则创建下一个进度表
-		end_lastLi = false; //此时创建的进度表处于未结束状态
-		addLi(index_uploadFile_Obj);
+	file_choose = document.getElementById('file').files[0];  //获取上传的文件对象
+	if (file_choose) {
+		let form_info = new FormData(document.getElementById('filename'));  //获取上传的文件的formdata信息
+		// 把上传的单个文件的formdata信息放入formObj
+		formObj = addFileObj(form_info, formObj);
+		// 把上传的单个文件对象放入uploadFile_obj
+		uploadFile_Obj = addFileObj(file_choose, uploadFile_Obj);
+		uploadFile_Obj.totalSize += file_choose.size;
+		// 把操作对象e放入eObj
+		eObj = addFileObj(e, eObj);
+		// 当前上传的单个请求所在的数组放入requestObj
+		requestObj = addFileObj(currentRequest_arr, requestObj);
+		if (end_lastLi) {  //如果上一个进度表创建完毕，则创建下一个进度表
+			end_lastLi = false; //此时创建的进度表处于未结束状态
+			addLi(index_uploadFile_Obj);
+		}
 	}
 }
 
@@ -335,47 +336,50 @@ function uploadDir() {
 	upload_type = 2; //上传文件夹
 	$('#folder').change(function (e) {
 		eObj = addFileObj(e, eObj);
-		let folder_name = null; //文件夹名
-		let files = e.target.files; //所有文件
-		files_arr = files;
+		let folder_name = null, //文件夹名
+			files = e.target.files;  //所有文件对象
+		files_Obj = files;
+		console.log(files_Obj);
+		for (let i = 0; i < files_Obj.length; i++) {
+			total_size += files_Obj[i].size;
+		}
 		folder_name = (files[0].webkitRelativePath).split('/')[0]; //获取文件夹名
 
-		//新建上传的同名文件夹
-		let new_data = `{"Opt":1,"DirName":["${folder_name}"]}`;
-		$.ajax(
-			{
-				url: home_rpc,
-				data: new_data,
-				type: "POST",
-				async: false,
-				success: function (result) {
-					if (result.code === 0) {
-						queryData(folder_name);
-						return true;
-					}
-					else {
-						alert(data.msg);
-						return false;
-					}
-				},
-				error: function () {
-					alert("Network error!")
+		// 新建上传的同名文件夹
+		let new_data = `{"dir_option":"dir_option_create","dir_name":["${folder_name}"]}`;
+		$.ajax({
+			url: home_rpc,
+			data: new_data,
+			type: "POST",
+			async: false,
+			success: function (result) {
+				if (result.code === 0) {
+					// 隐藏新建文件夹的框，使添加的文件直接加入表格中
+					let new_fold = current_path + "/" + folder_name;
+					queryData(new_fold);
+					return true;
 				}
-			});
-		index_uploadFile_Obj = 0;
-		addLi(index_uploadFile_Obj);
+				else {
+					alert(result.msg);
+					return false;
+				}
+			},
+			error: function () {
+				alert("Network error!")
+			}
+		});
+		addLi(li_index);
 	});
 }
 
 // 添加上传文件任务的进度表
 function addLi(index) {
 	if (upload_type === 1) {   //文件
-		file_obj = uploadFile_Obj[index];  //拿到当前上传的文件对象
-		// index_uploadFile_Obj = 0;  //下一个要上传的文件对象索引为0，因为结束上传uploadFile_Obj会清空
+		file_obj = file_choose;  //拿到当前上传的文件对象
 	}
 	else {   //文件夹
-		file_obj = files_arr[index];
-		index_uploadFile_Obj++;  //新上传的文件对象的索引递增
+		file_obj = files_Obj[index];
+		li_index++;  //新上传的文件对象的索引递增
 	}
 	let file_name = file_obj.name,
 		file_size = bytesToSize(file_obj.size);
@@ -385,17 +389,16 @@ function addLi(index) {
 	if (upload_type === 1) {   //文件
 		if (end_lastUpload) {  //如果上一个上传任务完成，则创建下一个上传任务
 			end_lastUpload = false;  //此时的上传任务处于未结束状态
-			// index_uploadFile_Obj++;  //上一个文件没有上传完，新上传的文件对象的索引递增
 			getFileMd5(index_uploadFile_Obj);
 		}
 	}
 	else {   //文件夹：先把文件夹中的所有文件的上传进度表都创建完成再逐个分片
-		if (index_uploadFile_Obj >= files_arr.length) {
-			index_uploadFile_Obj = 0;  //文件全部完成上传，新上传的文件对象的索引归0
-			getFileMd5(0);
+		if (li_index >= files_Obj.length) {  //已完成所有文件上传进度表的创建
+			li_index = 0;
+			getFileMd5(index_files_Obj);
 		}
 		else {
-			addLi(index_uploadFile_Obj);
+			addLi(li_index);
 		}
 	}
 }
@@ -406,47 +409,52 @@ function addLi(index) {
 *  @return
 */
 function newLoadli(name, size, dir) {
-	let uploadList = $("#uploadList");
-
-	let uploadStr = `
-		<li class="status">
-			<div class="process"></div>
-			<div class="file-info">
-				<div class="file-name">${name}</div>
-				<div class="file-size">${size}</div>
-				<div class="file-path">${dir}</div>
-				<div class="file-status">等待上传</div>
-				<div class="file-operate">
-					<em class="pause"></em>
-					<em class="remove"></em>
+	let uploadList = $("#uploadList"),
+		uploadStr = `
+			<li class="status">
+				<div class="process"></div>
+				<div class="file-info">
+					<div class="file-name">${name}</div>
+					<div class="file-size">${size}</div>
+					<div class="file-path">${dir}</div>
+					<div class="file-status">等待上传</div>
+					<div class="file-operate">
+						<em class="pause"></em>
+						<em class="remove"></em>
+					</div>
 				</div>
-			</div>
-		</li>	
-	`;
+			</li>	
+		`;
 	uploadList.append(uploadStr);
 }
 
 /* 计算文件的MD5值
 *  @params
-*      index 当前索引(eObj,uploadFile_Obj,files_arr) 
+*      index 当前索引(eObj,uploadFile_Obj,files_Obj) 
 *  @return 
 */
 function getFileMd5(index) {
-	let e_obj = null;
+	// let e_obj = null;
 	if (upload_type === 1) {  //文件
 		file_obj = uploadFile_Obj[index];
 		e_obj = eObj[index];
 	}
 	else {  //文件夹
-		file_obj = files_arr[index];
+		file_obj = files_Obj[index];
+		e_obj = eObj[index];
 	}
+	// let upload_btn = $(".upload"),
+	// 	upload_ul = $(".upload_file");
+	// 	upload_btn.on('mouseenter', function () {
+	// 		upload_ul.css("display", "none");
+	// 	});
 
 	console.log("------------计算MD5值-----------");
 
 	fileSize = file_obj.size;
 	fileName = file_obj.name;
-	if (fileSize <= 30 * 1024 * 1024) {  //不大于30M的
-		let fileReader = new FileReader()
+	// let fileReader = new FileReader()
+	if (fileSize <= 100 * 1024 * 1024) {  //不大于30M的
 		fileReader.readAsBinaryString(file_obj);
 		fileReader.onload = e_obj => {
 			md5_sum = SparkMD5.hashBinary(e_obj.target.result);
@@ -456,27 +464,12 @@ function getFileMd5(index) {
 		}
 	}
 	else {
-		let chunkSize = Math.ceil(fileSize / 10), //分成10片，每片的大小
-			fileReader = new FileReader(),
-			md5 = new SparkMD5(),
-			start = 0;  //起始字节
-		let loadFile = () => {
-			let slice = file_obj.slice(start, start + chunkSize);  //根据字节范围切割每一片
-			fileReader.readAsBinaryString(slice);
+		let worker = new Worker('./static/js/worker.js');
+		worker.onmessage = ev => {  //接收子线程发回来的消息,事件对象的data属性可以获取 Worker 发来的数据
+			md5_sum = JSON.parse(ev.data).md5;
 		}
-		loadFile();
-		fileReader.onload = e_obj => {
-			md5.appendBinary(e_obj.target.result);
-			if (start < fileSize) {
-				start += chunkSize;
-				loadFile();
-			} else {
-				md5_sum = md5.end();
-				console.log(md5_sum);
-				console.log("------------计算完成-----------");
-				uploadEach(index);
-			}
-		};
+		worker.postMessage(file_obj);//向子线程发送message事件
+		uploadEach(index);
 	}
 }
 
@@ -488,11 +481,12 @@ function getFileMd5(index) {
 function uploadEach(index) {
 	if (upload_type === 1) {
 		file_obj = uploadFile_Obj[index];
+		total_size = uploadFile_Obj.totalSize;
 	}
 	else {
-		file_obj = files_arr[index];
+		file_obj = files_Obj[index];
 	}
-	console.log(file_obj);
+	console.log("总字节数 = " + total_size);
 
 	chunkSize = chunk(fileSize);  //每片的大小
 	chunkNum = Math.ceil(fileSize / chunkSize);  //总片数
@@ -528,56 +522,60 @@ function uploadEach(index) {
 *  @return
 */
 function uploadPiece(start) {
-	current_path = ".";
 	// 上传完成 
 	if (start >= fileSize) {
 		console.log("------------上传完成-------------");
 		end_lastUpload = true;
-		process_global = 0;
-		chunkNum_uploaded = 0;
+		last_endindex++;
+		process_each = 0;
+		chunkNum_uploaded = 1;
 		if (upload_type === 1) {
-			index_uploadFile_Obj++;
+			index_uploadFile_Obj++;  //上一个文件没有上传完，新上传的文件对象的索引递增
 			if (index_uploadFile_Obj >= uploadFile_Obj.length) { //文件全部上传完毕
 				uploadFile_Obj = {
-					length: 0
+					length: 0,
+					totalSize: 0
 				};
-				queryData(current_path);
+				index_uploadFile_Obj = 0;
+				// queryData(current_path);
 			}
 			else {
 				getFileMd5(index_uploadFile_Obj);
 			}
 		}
 		else {
-			file_index++;
-			if (file_index >= files_arr.length) {  //文件夹的文件上传完毕
+			index_files_Obj++;
+			if (index_files_Obj >= files_Obj.length) {  //文件夹的文件上传完毕
 				queryData(current_path);
 			}
 			else {
-				getFileMd5(file_index);
+				getFileMd5(index_files_Obj);
 			}
 		}
-		return;
+		// return;
 	}
 	// 获取文件块的终止字节
 	end = (start + chunkSize > fileSize) ? fileSize : (start + chunkSize);
 
+	let form_data = null,
+		formData = new FormData();
 	// 将文件切块上传
-	let form_data = formObj[index_uploadFile_Obj]; //获取表单信息
-	let formData = new FormData();
-	if (upload_type === 1) { //上传文件
-		formData.append("user_name", username);
-		formData.append("src_file_path", "test");
-		formData.append("file_path", "/test1");
-		formData.append("file_name", fileName);
-		formData.append("size", fileSize);
-		formData.append("chunk_num", chunkNum);
-		formData.append("md5", md5_sum);
-		formData.append("chunk_index", chunkNum_uploaded);
+	formData.append("user_name", username);
+	formData.append("src_file_path", "test");
+	formData.append("file_path", current_path);
+	formData.append("file_name", fileName);
+	formData.append("size", fileSize);
+	formData.append("chunk_num", chunkNum);
+	formData.append("md5", md5_sum);
+	formData.append("chunk_index", chunkNum_uploaded);
+	if (upload_type === 1) {
+		form_data = formObj[index_uploadFile_Obj]; //获取表单信息
 		formData.append("upload_file", form_data.get("uploadfile").slice(start, end)); //将获取的文件分片赋给新的对象
 	}
-	else { //上传文件夹
-		formData.append("uploadfile", file_obj.slice(start, end)); //将获取的文件分片赋给新的对象
+	else {
+		formData.append("upload_file", file_obj.slice(start, end)); //将获取的文件分片赋给新的对象
 	}
+	console.log("准备上传第" + chunkNum_uploaded + "片......");
 
 	$.ajax({
 		url: upload_rpc,
@@ -601,7 +599,6 @@ function uploadPiece(start) {
 		success: function (result) {
 			if (result.code === 0) {
 				chunkNum_uploaded++;
-				console.log("准备上传第" + chunkNum_uploaded + "片......");
 				uploadPiece(end);
 			}
 			else {
@@ -618,49 +615,54 @@ function uploadPiece(start) {
 *  @return
 */
 function updateProgress(progress) {
-	let uploadList = document.getElementById("uploadList"),
-		thisIndex = 0, //文件对象索引
-		total_proc = 0; //总进度
+	let $uploadList = $("#uploadList"),
+		thisIndex = 0,  //文件对象索引
+		dom_index = last_endindex,
+		total_proc = 0;  //总进度占比
 	if (upload_type === 1) {
 		thisIndex = index_uploadFile_Obj;
 	}
 	else {
-		thisIndex = file_index;
+		thisIndex = index_files_Obj;
 	}
-	let process = uploadList.getElementsByClassName("process")[thisIndex], //li对应的进度标签
-		status = uploadList.getElementsByClassName("file-status")[thisIndex],
-		operate = uploadList.getElementsByClassName("file-operate")[thisIndex],
-		em1 = operate.getElementsByTagName("em")[0],
-		em2 = operate.getElementsByTagName("em")[1],
-		total = document.getElementsByClassName("total")[0];
+	let $total = $(".total");  //上传总进度
+	$process = $uploadList.find(".process").eq(dom_index),  //每个上传文件的li
+		$status = $uploadList.find(".file-status").eq(dom_index),  //每个上传文件的状态
+		$operate = $uploadList.find(".file-operate").eq(dom_index),  //每个上传文件的操作
+		em1 = $operate.children("em")[0],
+		em2 = $operate.children("em")[1];
+
 	if (progress.lengthComputable) {
-		console.log("loaded:" + progress.loaded, "total:" + progress.total);
-		let current_progress = progress.loaded / progress.total; //当前片的进度
-		process_global = (((chunkNum_uploaded - 1) / chunkNum) + (current_progress / chunkNum)) * 100; //每个文件总进度 = （已上传的片数/总片数 + 当前片的进度/总片数） * 100
-		let percent = process_global.toFixed(2) + "%";
-		console.log("percent:" + percent);
-		process.style.width = percent; //每个文件的进度
-		status.innerText = percent; //每个文件的进度值
-		total_percent[thisIndex] = process_global.toFixed(2);
-		if (upload_type === 2) { //文件夹
-			let len = files_arr.length;
-			for (let i = 0; i < total_percent.length; i++) {
-				let sum = total_percent[i] / len;
-				total_proc += sum;
+		let current_progress = progress.loaded / progress.total,  //当前片上传字节/当前片总字节
+			process_each = (((chunkNum_uploaded - 1) / chunkNum) + (current_progress / chunkNum)), //每个文件已上传片字节占比 = （已上传的片数/总片数 + 当前片的进度/总片数）
+			percent_each = (process_each * 100).toFixed(2) + "%";  //每个文件已上传片字节占百分比
+		console.log("该文件已上传：" + percent_each);
+		$process.css("width", percent_each);
+		$status.text(percent_each);
+
+		if (upload_type === 1) { //文件
+			let current_each = process_each * uploadFile_Obj[thisIndex].size,  //当前文件已上传字节数 = 已上传占比*该文件字节数
+				current_sum = 0;  //所有文件已上传的字节数
+			total_arr[thisIndex] = current_each;  //每个文件已上传字节数存入数组中，thisIndex作为索引，故索引下的值一直在变化
+			for (let i = 0; i < total_arr.length; i++) {
+				current_sum += total_arr[i];  //将数组中的字节数累加
 			}
+			total_proc = (current_sum / total_size).toFixed(2) * 100;  //总占比 = 已上传字节数 / 总字节数
 		}
-		else { //文件
-			let len = uploadFile_Obj.length;
-			for (let i = 0; i < total_percent.length; i++) {
-				let sum = total_percent[i] / len;
-				total_proc += sum;
+		else { //文件夹
+			let current_each = process_each * files_Obj[thisIndex].size,  //当前文件已上传字节数 = 已上传占比*该文件字节数
+				current_sum = 0;  //所有文件已上传的字节数
+			total_arr[thisIndex] = current_each;  //每个文件已上传字节数存入数组中，thisIndex作为索引，故索引下的值一直在变化
+			for (let i = 0; i < total_arr.length; i++) {
+				current_sum += total_arr[i];  //将数组中的字节数累加
 			}
+			total_proc = (current_sum / total_size).toFixed(2) * 100;  //总占比 = 已上传字节数 / 总字节数
 		}
-		console.log("total_percent:" + Math.round(total_proc));
-		total.style.width = Math.round(total_proc) + "%"; //总进度
-		if (process_global == 100) {
-			status.innerText = "上传成功";
-			status.style.color = "#9a079a";
+
+		$total.css("width", total_proc + "%"); //总进度
+		if (process_each == 100) {
+			$status.text("上传成功");
+			$status.css("color", "#9a079a");
 			em1.className = "clear";
 			em2.className = "";
 		}
@@ -696,7 +698,7 @@ function reUpload(index) {
 		file_name = uploadFile_Obj[index].name;
 	}
 	else {
-		file_name = files_arr[index].name;
+		file_name = files_Obj[index].name;
 	}
 
 	let upload_data = `{"Option":"reUploadFile","FileName":"${file_name}","Size":"${fileSize}","ChunkNum":"${chunkNum}","MD5":"${md5_file}","ChunkPos":"${chunkNum_uploaded}"}`;
@@ -729,7 +731,6 @@ function reUpload(index) {
 *  @return
 */
 function toTransport() {
-	current_path = ".";
 	let upload_module = $(".upload-progress"), //上传
 		download_module = $(".download-progress"), //下载
 		netdisk_page = $(".nav-title li").eq(0),
@@ -738,8 +739,8 @@ function toTransport() {
 		main_content = $(".main-content"),
 		disk_left = $(".disk"),
 		trans_left = $(".trans"),
-		download_menu = $(".trans .title").eq(0), //左侧下载菜单
-		upload_menu = $(".trans .title").eq(1); //左侧上传菜单
+		upload_menu = $(".trans .title").eq(0), //左侧上传菜单
+		download_menu = $(".trans .title").eq(1); //左侧下载菜单
 	// 替换右侧内容
 	main_content.css("display", "none");
 	disk_left.css("display", "none");
@@ -748,10 +749,10 @@ function toTransport() {
 	trans_left.css("display", "");
 	transport_page[0].className = "active";
 
-	isEmptyDownload();
+	isEmptyUpload();
 
 	// 点击下载
-	download_menu.on('click', function() {
+	download_menu.on('click', function () {
 		$(this).css("background", "##d0e3ea");
 		upload_menu.css("background", "");
 		upload_module.css("display", "none");
@@ -760,7 +761,7 @@ function toTransport() {
 	});
 
 	// 点击上传
-	upload_menu.on('click', function() {
+	upload_menu.on('click', function () {
 		$(this).css("background", "#d0e3ea");
 		download_menu.css("background", "");
 		download_module.css("display", "none");
@@ -838,7 +839,7 @@ function cancelUpload(index) {
 		file_name = uploadFile_Obj[index].name;
 	}
 	else {   //文件夹
-		file_name = files_arr[index].name;
+		file_name = files_Obj[index].name;
 	}
 
 	let upload_cancel = `{"Option":"uploadCancel","FileName":"${file_name}","Size":"","ChunkNum":"","MD5":"","ChunkPos":""}`;

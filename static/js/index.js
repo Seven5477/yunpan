@@ -108,7 +108,7 @@ function bindHTML() {
 		}
 		else {
 			current_path = _DATA.current_path;
-			current_dirname_arr =  _DATA[key] === "/" ? [""] : (_DATA[key].split('/')); //以数组的形式存储路径的文件夹名
+			current_dirname_arr = _DATA[key] === "/" ? [""] : (_DATA[key].split('/')); //以数组的形式存储路径的文件夹名
 			let str = ``,
 				text = "";
 			for (let i = 0; i < current_dirname_arr.length; i++) {
@@ -223,7 +223,7 @@ function clickHandle() {
 
 	// 鼠标停留/离开时显示/隐藏每行的操作图标
 	trList.on('mouseenter', function (e) {
-		if(trList.index($(this)) === 0)	return;
+		if (trList.index($(this)) === 0) return;
 		stopPropagation(e); //阻止冒泡
 		iconList.eq(trList.index($(this)) - 1).css("display", "block");
 	}).on('mouseleave', function (e) {
@@ -263,7 +263,7 @@ function clickHandle() {
 		dir_name = filenameList[i].innerText;
 		stopPropagation(e);
 		more_show.css("display", "none");
-		current_path  = current_path === "/" ? (current_path + dir_name) : (current_path + "/" + dir_name);
+		current_path = current_path === "/" ? (current_path + dir_name) : (current_path + "/" + dir_name);
 		if ($(i_list).eq(i).hasClass("dir_i")) { //文件夹可以点击进入
 			queryData(current_path);
 		}
@@ -288,7 +288,7 @@ function clickHandle() {
 			cssLeftHandle(data_index);
 			lastIndex_leftBtn = data_index; //保存当前的index
 		}
-		current_path  = current_path === "/" ? (current_path + dir_name) : (current_path + "/" + dir_name);
+		current_path = current_path === "/" ? (current_path + dir_name) : (current_path + "/" + dir_name);
 		if (!($(i_list).hasClass("dir_i"))) { //是文件不可进入
 			return;
 		}
