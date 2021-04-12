@@ -1,4 +1,4 @@
-let host = "localhost:9090";
+let host = "127.0.0.1:9099";
 
 // 链接地址
 let login_href = "http://" + host + "/login",
@@ -42,11 +42,13 @@ let username = localStorage.getItem("user"), //用户名
     chunkNum = 0, //总的分片数
     chunkSize = 0, //每片的大小
     chunkNum_uploaded = 1, //准备上传第几片
-    end = 0, //每一片的结束字节
+    startBit = 0,
+    endBit = 0, //每一片的结束字节
 
     // 计算MD5需要的变量
-    fileReader = new FileReader(),
+    fileReader = null,
     md5 = null,
+    currentChunk = 0,
     md5_sum = null,  //MD5值
     end_md5 = true,
     e_obj = null,

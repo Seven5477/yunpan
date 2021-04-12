@@ -355,7 +355,7 @@ function uploadDir() {
 			success: function (result) {
 				if (result.code === 0) {
 					// 隐藏新建文件夹的框，使添加的文件直接加入表格中
-					let new_fold = current_path + "/" + folder_name;
+					let new_fold = current_path === "/" ? (current_path + folder_name) : (current_path + "/" + folder_name);
 					queryData(new_fold);
 					return true;
 				}
@@ -389,13 +389,13 @@ function addLi(index) {
 	if (upload_type === 1) {   //文件
 		if (end_lastUpload) {  //如果上一个上传任务完成，则创建下一个上传任务
 			end_lastUpload = false;  //此时的上传任务处于未结束状态
-			getFileMd5(index_uploadFile_Obj);
+			uploadEach(index_uploadFile_Obj);
 		}
 	}
 	else {   //文件夹：先把文件夹中的所有文件的上传进度表都创建完成再逐个分片
 		if (li_index >= files_Obj.length) {  //已完成所有文件上传进度表的创建
 			li_index = 0;
-			getFileMd5(index_files_Obj);
+			uploadEach(index_files_Obj);
 		}
 		else {
 			addLi(li_index);
@@ -428,57 +428,13 @@ function newLoadli(name, size, dir) {
 	uploadList.append(uploadStr);
 }
 
-/* 计算文件的MD5值
-*  @params
-*      index 当前索引(eObj,uploadFile_Obj,files_Obj) 
-*  @return 
-*/
-function getFileMd5(index) {
-	// let e_obj = null;
-	if (upload_type === 1) {  //文件
-		file_obj = uploadFile_Obj[index];
-		e_obj = eObj[index];
-	}
-	else {  //文件夹
-		file_obj = files_Obj[index];
-		e_obj = eObj[index];
-	}
-	// let upload_btn = $(".upload"),
-	// 	upload_ul = $(".upload_file");
-	// 	upload_btn.on('mouseenter', function () {
-	// 		upload_ul.css("display", "none");
-	// 	});
-
-	console.log("------------计算MD5值-----------");
-
-	fileSize = file_obj.size;
-	fileName = file_obj.name;
-	// let fileReader = new FileReader()
-	if (fileSize <= 100 * 1024 * 1024) {  //不大于30M的
-		fileReader.readAsBinaryString(file_obj);
-		fileReader.onload = e_obj => {
-			md5_sum = SparkMD5.hashBinary(e_obj.target.result);
-			console.log(md5_sum);
-			console.log("------------计算完成-----------");
-			uploadEach(index);
-		}
-	}
-	else {
-		let worker = new Worker('./static/js/worker.js');
-		worker.onmessage = ev => {  //接收子线程发回来的消息,事件对象的data属性可以获取 Worker 发来的数据
-			md5_sum = JSON.parse(ev.data).md5;
-		}
-		worker.postMessage(file_obj);//向子线程发送message事件
-		uploadEach(index);
-	}
-}
-
 /* 排队上传单个文件
 *  @params
 		index 文件数组索引
 *  @return
 */
 function uploadEach(index) {
+	console.log(index);
 	if (upload_type === 1) {
 		file_obj = uploadFile_Obj[index];
 		total_size = uploadFile_Obj.totalSize;
@@ -487,9 +443,14 @@ function uploadEach(index) {
 		file_obj = files_Obj[index];
 	}
 	console.log("总字节数 = " + total_size);
+	console.log(file_obj);
 
+	fileSize = file_obj.size;
+	fileName = file_obj.name;
 	chunkSize = chunk(fileSize);  //每片的大小
 	chunkNum = Math.ceil(fileSize / chunkSize);  //总片数
+	md5 = new SparkMD5();
+	fileReader = new FileReader();
 	uploadPiece(0);
 	// $.ajax(
 	// 	{
@@ -522,8 +483,9 @@ function uploadEach(index) {
 *  @return
 */
 function uploadPiece(start) {
+	startBit = start;
 	// 上传完成 
-	if (start >= fileSize) {
+	if (startBit >= fileSize) {
 		console.log("------------上传完成-------------");
 		end_lastUpload = true;
 		last_endindex++;
@@ -537,10 +499,12 @@ function uploadPiece(start) {
 					totalSize: 0
 				};
 				index_uploadFile_Obj = 0;
-				// queryData(current_path);
+				queryData(current_path);
 			}
 			else {
-				getFileMd5(index_uploadFile_Obj);
+				console.log("!!!")
+				md5_sum = null;
+				uploadEach(index_uploadFile_Obj);
 			}
 		}
 		else {
@@ -549,14 +513,50 @@ function uploadPiece(start) {
 				queryData(current_path);
 			}
 			else {
-				getFileMd5(index_files_Obj);
+				md5_sum = null;
+				uploadEach(index_files_Obj);
 			}
 		}
-		// return;
+		return;
 	}
 	// 获取文件块的终止字节
-	end = (start + chunkSize > fileSize) ? fileSize : (start + chunkSize);
+	endBit = (startBit + chunkSize > fileSize) ? fileSize : (startBit + chunkSize);
+	console.log("准备上传第" + chunkNum_uploaded + "/" + chunkNum + "片......");
 
+	// 计算每一片的MD5
+	let slice = file_obj.slice(startBit, startBit + chunkSize);
+	fileReader.readAsBinaryString(slice);
+	fileReader.onload = e_obj => {
+		md5.appendBinary(e_obj.target.result);
+
+		// 计算整个文件的MD5
+		if (chunkNum_uploaded === chunkNum) {
+			md5_sum = md5.end();
+			console.log(md5_sum);
+			console.log("------------计算完成-----------");
+		}
+	}
+
+	// 判断最后一片有没有拿到md5
+	if ((chunkNum_uploaded === chunkNum)) {
+		// 如果没有拿到，就循环等待md5的值，拿到后停止循环，并且上传最后一片文件
+		if (!md5_sum) {
+			let timer = setInterval(() => {
+				if (md5_sum) {
+					clearInterval(timer);
+					sendPiece();
+				}
+			}, 1000);
+			return;
+		}
+	}
+
+	// 上传当前片文件
+	sendPiece();
+}
+
+// 发送每一片请求
+function sendPiece() {
 	let form_data = null,
 		formData = new FormData();
 	// 将文件切块上传
@@ -570,12 +570,11 @@ function uploadPiece(start) {
 	formData.append("chunk_index", chunkNum_uploaded);
 	if (upload_type === 1) {
 		form_data = formObj[index_uploadFile_Obj]; //获取表单信息
-		formData.append("upload_file", form_data.get("uploadfile").slice(start, end)); //将获取的文件分片赋给新的对象
+		formData.append("upload_file", form_data.get("uploadfile").slice(startBit, endBit)); //将获取的文件分片赋给新的对象
 	}
 	else {
-		formData.append("upload_file", file_obj.slice(start, end)); //将获取的文件分片赋给新的对象
+		formData.append("upload_file", file_obj.slice(startBit, endBit)); //将获取的文件分片赋给新的对象
 	}
-	console.log("准备上传第" + chunkNum_uploaded + "片......");
 
 	$.ajax({
 		url: upload_rpc,
@@ -584,7 +583,7 @@ function uploadPiece(start) {
 		cache: false,
 		processData: false,
 		contentType: false, //必须false才会自动加上正确的Content-Type
-		//这里我们先拿到jQuery产生的 XMLHttpRequest对象，为其增加 progress 事件绑定，然后再返回交给ajax使用
+		// 这里我们先拿到jQuery产生的 XMLHttpRequest对象，为其增加 progress 事件绑定，然后再返回交给ajax使用
 		xhr: function () {
 			let xhr = $.ajaxSettings.xhr();
 			if (xhr.upload) {
@@ -599,7 +598,7 @@ function uploadPiece(start) {
 		success: function (result) {
 			if (result.code === 0) {
 				chunkNum_uploaded++;
-				uploadPiece(end);
+				uploadPiece(endBit);
 			}
 			else {
 				alert(result.msg);
@@ -683,7 +682,7 @@ function pauseUpload(index) {
 	if (index < requestObj.length - 1) {
 		index++;
 		chunkNum_uploaded = 1;
-		getFileMd5(index);
+		uploadEach(index);
 	}
 }
 
@@ -712,7 +711,7 @@ function reUpload(index) {
 			success: function (data) {
 				if (data.code == 1000) {
 					console.log(data.description);
-					uploadPiece(end - chunkSize);
+					uploadPiece(endBit - chunkSize);
 					return true;
 				}
 				else {
